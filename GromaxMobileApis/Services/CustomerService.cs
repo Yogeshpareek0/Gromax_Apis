@@ -894,5 +894,23 @@ namespace GromaxMobileApis.Services
             }
         }
 
+        public async Task<IEnumerable<dynamic>> getAllDealerDb()
+        {
+            try
+            {
+                var Param = new { username = _user.GetUserName(), loginAs = _user.GetPositionName() };
+                var res = await _db.QueryAsync(
+                  "usp_getDealerByLogin",
+                  param: Param,
+                  commandType: CommandType.StoredProcedure);
+                return res;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
     }
 }

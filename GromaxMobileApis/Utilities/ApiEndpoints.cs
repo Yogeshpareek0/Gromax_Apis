@@ -188,6 +188,7 @@ namespace GromaxMobileApis.Utilities
             public const string DealerListStatewise = HomeBase + "DealerListStateWise";
             public const string DealerDetailByDealerCode = HomeBase + "DealerDetailByDealerCode";
             public const string updateDealerAssignments = HomeBase + "updateDealerAssignments";
+            public const string allDealerList = HomeBase + "allDealerList";
 
         }
         public static class Retiledsales

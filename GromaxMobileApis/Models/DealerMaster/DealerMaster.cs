@@ -117,4 +117,7 @@ namespace GromaxMobileApis.Models.DealerMaster
         [EmailAddress(ErrorMessage = "Invalid email address")]
         public string ServiceCcmEmail { get; set; }
     }
+
+
+   
 }

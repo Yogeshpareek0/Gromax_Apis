@@ -1027,6 +1027,23 @@ namespace GromaxMobileApis.Controllers
             }
         }
 
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.ApiRoutes.DealerMaster.allDealerList)]
+        public async Task<IActionResult> allDealerList()
+        {
+            try
+            {
+                var l = await _customerService.getAllDealerDb();
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(l));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
         //[AllowAnonymous]
         //[HttpGet]
         //[Route(GromaxMobileApis.Utilities.customerServices.invoice.service)]

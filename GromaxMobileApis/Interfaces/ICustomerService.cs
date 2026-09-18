@@ -79,6 +79,9 @@ namespace GromaxMobileApis.Interfaces
 
         Task<int> UpdateMechanicDb(MechanicUpdateRequest m);
 
+        Task<IEnumerable<dynamic>> getAllDealerDb();
+
+
 
 
 
