@@ -165,6 +165,9 @@ namespace GromaxMobileApis.Interfaces
 
         Task<IEnumerable<ResponseEmployeeByPosition>> getEmployeeMasterListByPositionDb(string position);
 
+        Task<int> addBaseLocationdb(EmployeeBaseLocationRequest m);
+
+
 
 
 

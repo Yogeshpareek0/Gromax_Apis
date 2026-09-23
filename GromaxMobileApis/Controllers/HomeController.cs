@@ -37,6 +37,7 @@ namespace GromaxMobileApis.Controllers
     //RoleMaster.AM + "," +
     //RoleMaster.TM)]
     //[Route("Api/[Controller]")]
+    //[ApiController]
     public class HomeController : ControllerBase
     {
         private IDatabaseService _db;
@@ -1770,7 +1771,7 @@ namespace GromaxMobileApis.Controllers
 
                 if (file != null)
                 {
-                    file1 = await _getFilename._getFileName(file);
+                    file1 = await _getFilename._getFileNamev1(file, model.dealershipCode.ToString() + "_generateEnquiry");
                 }
                 //var file1 = "http//loadimage.com/image.pdf";
 
@@ -1905,7 +1906,7 @@ namespace GromaxMobileApis.Controllers
 
                 if (file != null)
                 {
-                    file1 = await _getFilename._getFileName(file);
+                    file1 = await _getFilename._getFileNamev1(file, model.enquiryMainModel.dealershipCode.ToString() + "_generateEnquiry");
                 }
                 //var file1 = "http//loadimage.com/image.pdf";
                 if (string.IsNullOrEmpty(model.enquiryMainModel.dealershipCode) && string.IsNullOrEmpty(model.enquiryMainModel.Enquiry.prospectMobile))
@@ -2358,17 +2359,17 @@ namespace GromaxMobileApis.Controllers
                     {
                         return Ok(ApiResponse<string>.Fail("Failed"));
                     }
-                    file1 = await _getFilename._getFileName(model.file1);
+                    file1 = await _getFilename._getFileNamev1(model.file1, model.MobileNo.ToString() + "_SalesmanFile1");
                     if (string.IsNullOrEmpty(file1))
                     {
                         return Ok(ApiResponse<string>.Fail("File1 blank"));
                     }
-                    file2 = await _getFilename._getFileName(model.file2);
+                    file2 = await _getFilename._getFileNamev1(model.file2, model.MobileNo.ToString() + "_SalesmanFile2");
                     if (string.IsNullOrEmpty(file2))
                     {
                         return Ok(ApiResponse<string>.Fail("File2 blank"));
                     }
-                    file3 = await _getFilename._getFileName(model.file3);
+                    file3 = await _getFilename._getFileNamev1(model.file3, model.MobileNo.ToString() + "_SalesmanFile3");
                     if (string.IsNullOrEmpty(file3))
                     {
                         return Ok(ApiResponse<string>.Fail("File3 blank"));
@@ -2885,6 +2886,8 @@ namespace GromaxMobileApis.Controllers
             }
 
         }
+
+        
 
     }
 

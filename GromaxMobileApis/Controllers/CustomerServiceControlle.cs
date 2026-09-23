@@ -1,4 +1,5 @@
-﻿using GromaxMobileApis.Interfaces;
+﻿using Google.Apis.Util;
+using GromaxMobileApis.Interfaces;
 using GromaxMobileApis.Models.DealerMaster;
 using GromaxMobileApis.Models.Services;
 using GromaxMobileApis.Models.VerifyWebhook;
@@ -14,6 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -31,13 +33,16 @@ namespace GromaxMobileApis.Controllers
         private IAzureStorageService _azure;
         private readonly ServiceInvoicePdfGenerator _pdfGenerator;
         private readonly ILogger<CustomerServiceControlle> _logger;
-        public CustomerServiceControlle(ICustomerService customerService, getFileName getFileName, IAzureStorageService azure, ILogger<CustomerServiceControlle> logger, ServiceInvoicePdfGenerator serviceInvoice)
+        private readonly IDatabaseService _db;
+        public CustomerServiceControlle(ICustomerService customerService, getFileName getFileName,
+            IAzureStorageService azure, ILogger<CustomerServiceControlle> logger, ServiceInvoicePdfGenerator serviceInvoice, IDatabaseService databaseService)
         {
             _customerService = customerService;
             _getFileName = getFileName;
             _azure = azure;
             _logger = logger;
             _pdfGenerator = serviceInvoice;
+            _db = databaseService;
         }
         [HttpGet]
         [Route(GromaxMobileApis.Utilities.customerServices.pdiList)]
@@ -1028,13 +1033,15 @@ namespace GromaxMobileApis.Controllers
         }
 
 
+
+
         [HttpGet]
         [Route(GromaxMobileApis.Utilities.ApiRoutes.DealerMaster.allDealerList)]
-        public async Task<IActionResult> allDealerList()
+        public async Task<IActionResult> allDealerList([FromQuery] int status = 2)
         {
             try
             {
-                var l = await _customerService.getAllDealerDb();
+                var l = await _customerService.getAllDealerDb(status);
                 return Ok(ApiResponse<IEnumerable<dynamic>>.Success(l));
             }
             catch (Exception ex)
@@ -1042,6 +1049,134 @@ namespace GromaxMobileApis.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
             }
         }
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.reimbursement.insertReimbursementScore)]
+        public async Task<IActionResult> insertReimbursementScore([FromBody] ReimbursementRequest m)
+        {
+            try
+            {
+                ReimbursementDataTables dataTables = new ReimbursementDataTables();
+                try
+                {
+                    dataTables = UtilityFunctions.CreateReimbursementDataTables(m);
+                }
+                catch
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, ApiResponse<string>.BadRequest("Unable to proceed dt conversion."));
+                }
+                var r = await _customerService.insertReimbursementScoreDb(m, dataTables);
+                if (r <= 0)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail("Unable to Add Reimbursement Score."));
+                }
+
+                return Ok(
+                    ApiResponse<string>.Success("Reimbursement Score update successfully."));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.ApiRoutes.DealerMaster.addBaseLocation)]
+        public async Task<IActionResult> addBaseLocation([FromBody] EmployeeBaseLocationRequest m)
+        {
+            try
+            {
+                var result = await _db.addBaseLocationdb(m);
+                if (result > 0)
+                    return Ok(ApiResponse<string>.Created());
+                return NotFound(ApiResponse<string>.NotFound("Record not found."));
+
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<string>.Fail(ex.Message));
+            }
+
+
+
+        }
+
+
+
+
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.pdiReport)]
+        public async Task<IActionResult> pdiReport([FromQuery] PdiReportReqModel m)
+        {
+            try
+            {
+                var l = await _customerService.getPdiReportDb(m);
+                return Ok(ApiResponse<PdiReportResponse>.Success(l));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.ntirReport)]
+        public async Task<IActionResult> ntirReport([FromQuery] NtirReportReqModel m)
+        {
+            try
+            {
+                var l = await _customerService.getNtirReportDb(m);
+                return Ok(ApiResponse<NtirReportResponse>.Success(l));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.ApiRoutes.Other.imageSave)]
+        public async Task<IActionResult> imageSave([Required] IFormFile file, [Required] string FileName)
+        {
+            try
+            {
+                try
+                {
+                    _getFileName.ImageValidation(file, FileName);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ApiResponse<string>.BadRequest(ex.Message));
+                }
+                string fileUrl = await _getFileName._getFileNamev1(file, FileName);
+                return Ok(ApiResponse<string>.Success(fileUrl));
+            }
+            catch
+            {
+                return StatusCode(
+               StatusCodes.Status500InternalServerError,
+               ApiResponse<string>.BadRequest("An error occurred while uploading the image."));
+            }
+        }
+
 
 
         //[AllowAnonymous]

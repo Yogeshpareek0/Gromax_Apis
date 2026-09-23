@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 
 namespace GromaxMobileApis.Models.Services
 {
@@ -198,6 +199,46 @@ namespace GromaxMobileApis.Models.Services
         public string AllowedScores { get; set; }
     }
 
+
+    public class ReimbursementRequest
+    {
+        [Required(ErrorMessage = "DealerCode is required")]
+        public string DealerCode { get; set; }
+
+        [Required(ErrorMessage = "Date is required")]
+        public DateTime Date { get; set; }
+
+        [Required(ErrorMessage = "Points Score is required")]
+        public List<ReimbursementPoint> Points { get; set; }
+
+        [Required(ErrorMessage = "Points Images is required")]
+        public List<ReimbursementPointImage> PointImages { get; set; }
+    }
+
+    public class ReimbursementPoint
+    {
+        [Required(ErrorMessage = "Id is required")]
+        public Guid PointId { get; set; }
+
+        public int Score { get; set; }
+    }
+
+    public class ReimbursementPointImage
+    {
+        [Required(ErrorMessage = "Id is required")]
+
+        public Guid PointId { get; set; }
+
+        public string Image { get; set; }
+    }
+
+
+    public class ReimbursementDataTables
+    {
+        public DataTable Points { get; set; }
+
+        public DataTable PointImages { get; set; }
+    }
 
 }
 

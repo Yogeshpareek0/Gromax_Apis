@@ -2892,5 +2892,16 @@ namespace GromaxMobileApis.Services
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<int> addBaseLocationdb(EmployeeBaseLocationRequest m)
+        {
+            try
+            {
+                var result = await _db.ExecuteScalarAsync<int>("usp_AddBaseLocation",
+                    param: m, commandType: CommandType.StoredProcedure);
+                return result;
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
     }
 }

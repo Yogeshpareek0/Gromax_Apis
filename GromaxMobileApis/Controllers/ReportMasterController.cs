@@ -672,9 +672,9 @@ namespace GromaxMobileApis.Controllers
                 if (model.mopProof == null)
                     return Ok(ApiResponse<string>.BadRequest("MOP Proof file is required."));
                 else
-                    mopProofString = await _getFilename._getFileName(model.mopProof);
+                    mopProofString = await _getFilename._getFileNamev1(model.mopProof, "MopProof_PricePosition");
                 if (model.rcCopy != null)
-                    rcCopyString = await _getFilename._getFileName(model.rcCopy);
+                    rcCopyString = await _getFilename._getFileNamev1(model.rcCopy, "RcCopy_PricePosition");
                 var result = await _reportMaster.insertPricePositiondb(model, mopProofString, rcCopyString);
 
                 if (result > 0)

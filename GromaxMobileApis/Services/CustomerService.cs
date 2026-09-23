@@ -894,11 +894,11 @@ namespace GromaxMobileApis.Services
             }
         }
 
-        public async Task<IEnumerable<dynamic>> getAllDealerDb()
+        public async Task<IEnumerable<dynamic>> getAllDealerDb(int status)
         {
             try
             {
-                var Param = new { username = _user.GetUserName(), loginAs = _user.GetPositionName() };
+                var Param = new { username = _user.GetUserName(), loginAs = _user.GetPositionName(), status = status };
                 var res = await _db.QueryAsync(
                   "usp_getDealerByLogin",
                   param: Param,
@@ -912,5 +912,106 @@ namespace GromaxMobileApis.Services
             }
         }
 
+        public async Task<int> insertReimbursementScoreDb(ReimbursementRequest m, ReimbursementDataTables dt)
+        {
+            try
+            {
+                var param = new
+                {
+                    PointImages = dt.PointImages,
+                    Points = dt.Points,
+                    m.Date,
+                    m.DealerCode,
+                    CreatedBy = _user.GetUserName(),
+                    LoginAs = _user.GetPositionName()
+                };
+                var res = await _db.ExecuteScalarAsync<int>(
+                    "usp_InsertReimbursementScore",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
+        public async Task<PdiReportResponse> getPdiReportDb(PdiReportReqModel m)
+        {
+            try
+            {
+                var param = new
+                {
+
+                    loginas = _user.GetPositionName(),
+                    username = _user.GetUserName(),
+                    m.state,
+                    m.dealerCode,
+                    m.modelName,
+                    m.chasisNo,
+                    m.rowStart,
+                    m.pageSize,
+                    m.duration,
+                    m.stDate,
+                    m.enDate
+                };
+                using (var multi = await _db.QueryMultipleAsync("usp_pdiReport", param, commandType: CommandType.StoredProcedure))
+                {
+                    var pdiReport = await multi.ReadAsync();
+                    var countResponse = await multi.ReadSingleAsync<PdiCountResponse>();
+
+                    return new PdiReportResponse
+                    {
+                        pdiReport = pdiReport,
+                        countResponse = countResponse
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
+        public async Task<NtirReportResponse> getNtirReportDb(NtirReportReqModel m)
+        {
+            try
+            {
+                var param = new
+                {
+
+                    loginas = _user.GetPositionName(),
+                    username = _user.GetUserName(),
+                    m.state,
+                    m.dealerCode,
+                    m.modelName,
+                    m.chasisNo,
+                    m.rowStart,
+                    m.pageSize,
+                    m.duration,
+                    m.stDate,
+                    m.enDate
+                };
+                using (var multi = await _db.QueryMultipleAsync("usp_ntirReport", param, commandType: CommandType.StoredProcedure))
+                {
+                    var pdiReport = await multi.ReadAsync();
+                    var countResponse = await multi.ReadSingleAsync<NtirCountResponse>();
+
+                    return new NtirReportResponse
+                    {
+                        ntirReport = pdiReport,
+                        countResponse = countResponse
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
     }
 }

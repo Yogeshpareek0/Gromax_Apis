@@ -113,6 +113,7 @@ namespace GromaxMobileApis.Utilities
             public const string updatedealer = HomeBase + "updatedealer";
             public const string getbillingReqData = HomeBase + "getbillingReqData";
             public const string getDealerByTehsil = HomeBase + "getDealerByTehsil";
+            public const string imageSave = HomeBase + "imageSave";
 
             //public const string GetStateListByLogin = HomeBase + "GetStateListByLogin";
         }
@@ -189,6 +190,8 @@ namespace GromaxMobileApis.Utilities
             public const string DealerDetailByDealerCode = HomeBase + "DealerDetailByDealerCode";
             public const string updateDealerAssignments = HomeBase + "updateDealerAssignments";
             public const string allDealerList = HomeBase + "allDealerList";
+            public const string addBaseLocation = HomeBase + "addBaseLocation";
+
 
         }
         public static class Retiledsales
@@ -401,6 +404,8 @@ namespace GromaxMobileApis.Utilities
 
         public const string uploadNTIRImage = Base + "uploadNTIRImage";
         public const string MetaLead = Base + "MetaLead";
+        public const string pdiReport = Base + "pdiReport";
+        public const string ntirReport = Base + "ntirReport";
 
 
         public const string GetPendingServiceInvoiceInstallation = Base + "GetPendingServiceInvoiceInstallation";
@@ -438,6 +443,7 @@ namespace GromaxMobileApis.Utilities
         public static class reimbursement
         {
             public const string getReimbursementList = Base + "getReimbursementList";
+            public const string insertReimbursementScore = Base + "insertReimbursementScore";
 
         }
 

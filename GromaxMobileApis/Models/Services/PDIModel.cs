@@ -40,4 +40,32 @@ namespace GromaxMobileApis.Models.Services
         public string searchQuery { get; set; }
         public string searchBy { get; set; }
     }
+
+    public class PdiReportReqModel
+    {
+        public string state { get; set; }
+        public string dealerCode { get; set; }
+        public string modelName { get; set; }
+        public string chasisNo { get; set; }
+        public string duration { get; set; }
+        public DateTime? stDate { get; set; }
+        public DateTime? enDate { get; set; }
+        public int pageSize { get; set; }
+        public int rowStart { get; set; }
+    }
+    public class PdiCountResponse
+    {
+        public int totalTractorsCount { get; set; }
+        public int pdiCompletedCount { get; set; }
+        public int pdiPendingCount { get; set; }
+        public int defectFoundCount { get; set; }
+    }
+
+    public class PdiReportResponse
+    {
+        public IEnumerable<dynamic> pdiReport { get; set; }
+        public PdiCountResponse countResponse { get; set; }
+
+
+    }
 }

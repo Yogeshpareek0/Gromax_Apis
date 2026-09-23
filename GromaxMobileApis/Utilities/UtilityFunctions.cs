@@ -1066,5 +1066,54 @@ namespace GromaxMobileApis.Utilities
                 throw;
             }
         }
+
+
+        public static ReimbursementDataTables CreateReimbursementDataTables(ReimbursementRequest model)
+        {
+            ReimbursementDataTables tables = new ReimbursementDataTables();
+
+            #region Points
+
+            tables.Points = new DataTable();
+
+            tables.Points.Columns.Add("PointId", typeof(Guid));
+            tables.Points.Columns.Add("Score", typeof(decimal));
+
+            if (model.Points != null)
+            {
+                foreach (var item in model.Points)
+                {
+                    tables.Points.Rows.Add(
+                        item.PointId,
+                        item.Score
+                    );
+                }
+            }
+
+            #endregion
+
+
+            #region Point Images
+
+            tables.PointImages = new DataTable();
+
+            tables.PointImages.Columns.Add("PointId", typeof(Guid));
+            tables.PointImages.Columns.Add("Image", typeof(string));
+
+            if (model.PointImages != null)
+            {
+                foreach (var item in model.PointImages)
+                {
+                    tables.PointImages.Rows.Add(
+                        item.PointId,
+                        item.Image
+                    );
+                }
+            }
+
+            #endregion
+
+            return tables;
+        }
     }
 }

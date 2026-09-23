@@ -118,6 +118,24 @@ namespace GromaxMobileApis.Models.DealerMaster
         public string ServiceCcmEmail { get; set; }
     }
 
+    public class EmployeeBaseLocationRequest
+    {
 
-   
+        [Required(ErrorMessage = "Employee Id is required.")]
+        public int EmployeeId { get; set; }
+
+        [Required(ErrorMessage = "State Code is required.")]
+        public int StateCode { get; set; }
+
+        [Required(ErrorMessage = "District Code is required.")]
+        public int DistrictCode { get; set; }
+
+        [Required(ErrorMessage = "Tehsil Code is required.")]
+        public int TehsilCode { get; set; }
+
+        [Required(ErrorMessage = "Village Code is required.")]
+        public int VillageCode { get; set; }
+        public string OtherLocation { get; set; }
+    }
+
 }

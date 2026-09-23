@@ -69,4 +69,34 @@ namespace GromaxMobileApis.Models.Services
         public List<NTIRFieldResponse> NtirFieldsMaster { get; set; }
     }
 
+
+
+    public class NtirReportReqModel
+    {
+        public string state { get; set; }
+        public string dealerCode { get; set; }
+        public string modelName { get; set; }
+        public string chasisNo { get; set; }
+        public string duration { get; set; }
+        public DateTime? stDate { get; set; }
+        public DateTime? enDate { get; set; }
+        public int pageSize { get; set; }
+        public int rowStart { get; set; }
+    }
+    public class NtirCountResponse
+    {
+        public int totalTractorsCount { get; set; }
+        public int ntirCompletedCount { get; set; }
+        public int ntirPendingCount { get; set; }
+        public int defectFoundCount { get; set; }
+    }
+
+    public class NtirReportResponse
+    {
+        public IEnumerable<dynamic> ntirReport { get; set; }
+        public NtirCountResponse countResponse { get; set; }
+
+
+    }
+
 }
