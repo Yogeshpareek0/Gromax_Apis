@@ -52,6 +52,7 @@ namespace GromaxMobileApis.Models.Services
         public DateTime? enDate { get; set; }
         public int pageSize { get; set; }
         public int rowStart { get; set; }
+        public Boolean isDownload { get; set; } = false;
     }
     public class PdiCountResponse
     {

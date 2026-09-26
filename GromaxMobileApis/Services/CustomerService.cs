@@ -955,7 +955,8 @@ namespace GromaxMobileApis.Services
                     m.pageSize,
                     m.duration,
                     m.stDate,
-                    m.enDate
+                    m.enDate,
+                    m.isDownload
                 };
                 using (var multi = await _db.QueryMultipleAsync("usp_pdiReport", param, commandType: CommandType.StoredProcedure))
                 {
@@ -993,7 +994,8 @@ namespace GromaxMobileApis.Services
                     m.pageSize,
                     m.duration,
                     m.stDate,
-                    m.enDate
+                    m.enDate,
+                    m.isDownload
                 };
                 using (var multi = await _db.QueryMultipleAsync("usp_ntirReport", param, commandType: CommandType.StoredProcedure))
                 {

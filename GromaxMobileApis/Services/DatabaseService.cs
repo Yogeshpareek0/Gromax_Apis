@@ -2903,5 +2903,17 @@ namespace GromaxMobileApis.Services
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
+
+
+        public async Task<IEnumerable<sourceSubSourceMaster>> getNDASourceSubSourcedb()
+        {
+            try
+            {
+                var param = new { loginas = _user.GetPositionName() };
+                var result = await _db.QueryAsync<sourceSubSourceMaster>("usp_getNDASourceSubSource", param: param, commandType: CommandType.StoredProcedure);
+                return result;
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
     }
 }

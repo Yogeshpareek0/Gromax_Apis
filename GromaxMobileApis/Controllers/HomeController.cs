@@ -2887,7 +2887,27 @@ namespace GromaxMobileApis.Controllers
 
         }
 
-        
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.ApiRoutes.SalesEnquiry.getNDASourceSubSource)]
+        public async Task<IActionResult> getNDASourceSubSource()
+        {
+            try
+            {
+                var result = await _db.getNDASourceSubSourcedb();
+                //var Source = result.Select(x => x.SourceName).Distinct();
+                //var subSource = result.Select(x => x.sub).Distinct();
+                return Ok(ApiResponse<IEnumerable<sourceSubSourceMaster>>.Success(result));
+
+
+            }
+            catch (Exception Ex)
+            {
+                return Ok(ApiResponse<string>.Fail(Ex.Message));
+            }
+        }
+
+
 
     }
 

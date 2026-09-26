@@ -168,6 +168,10 @@ namespace GromaxMobileApis.Interfaces
         Task<int> addBaseLocationdb(EmployeeBaseLocationRequest m);
 
 
+        Task<IEnumerable<sourceSubSourceMaster>> getNDASourceSubSourcedb();
+
+
+
 
 
 

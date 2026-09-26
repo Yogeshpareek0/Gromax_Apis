@@ -70,6 +70,7 @@ namespace GromaxMobileApis.Utilities
             public const string UpdtGenerateEnquiryv3 = HomeBase + "UpdtGenerateEnquiryv3";
             public const string GetSalesEnquiryById2 = HomeBase + "GetSalesEnquiryById2";
             public const string getSourceSubSource = HomeBase + "getSourceSubSource";
+            public const string getNDASourceSubSource = HomeBase + "getNDASourceSubSource";
             public const string getSourceSubSourceForRepFilter = HomeBase + "getSourceSubSourceForRepFilter";
             public const string getUnassignedCount = HomeBase + "getUnassignedCount";
             public const string getThreeDaysOdEnquiries = HomeBase + "getThreeDaysOdEnquiries";
