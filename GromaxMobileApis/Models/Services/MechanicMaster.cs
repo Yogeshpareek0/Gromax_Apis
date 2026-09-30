@@ -32,6 +32,9 @@ namespace GromaxMobileApis.Models.Services
         public string CompleteTractorTraining { get; set; }
         public string SystemAndProcess { get; set; }
 
+        public int SkillLevel { get; set; } = 0;
+        public int ServiceManpower { get; set; } = 0;
+
         public string ApprovalStatus { get; set; }
 
         public string ApprovedBy { get; set; }
@@ -73,6 +76,8 @@ namespace GromaxMobileApis.Models.Services
         public string EngineAttendance { get; set; }
         public string CompleteTractorTraining { get; set; }
         public string SystemAndProcess { get; set; }
+        public int SkillLevel { get; set; } = 0;
+        public int ServiceManpower { get; set; } = 0;
 
         public string CreatedBy { get; set; }
     }
@@ -125,6 +130,8 @@ namespace GromaxMobileApis.Models.Services
         public string EngineAttendance { get; set; }
         public string CompleteTractorTraining { get; set; }
         public string SystemAndProcess { get; set; }
+        public int SkillLevel { get; set; } = 0;
+        public int ServiceManpower { get; set; } = 0;
         public string CurrentStatus { get; set; }
         public DateTime? DeletedStatusDate { get; set; }
 
