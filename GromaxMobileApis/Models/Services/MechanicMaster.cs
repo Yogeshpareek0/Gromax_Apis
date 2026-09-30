@@ -144,4 +144,10 @@ namespace GromaxMobileApis.Models.Services
         }
 
     }
+
+    public class MechanicDropdownResponse
+    {
+        public IEnumerable<dynamic> ServiceManagerList { get; set; }
+        public IEnumerable<dynamic> SkillLevelList { get; set; }
+    }
 }

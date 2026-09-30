@@ -428,6 +428,8 @@ namespace GromaxMobileApis.Utilities
             public const string updateJobCard = Base + "updateJobCard";
             public const string getOpenJobCard = Base + "getOpenJobCard";
             public const string getFreeServiceClosedJobCard = Base + "getFreeServiceClosedJobCard";
+            public const string GetJobCardPdf = Base + "GetJobCardPdf";
+            public const string removeJobCardDraft = Base + "removeJobCardDraft";
 
 
         }
@@ -460,6 +462,7 @@ namespace GromaxMobileApis.Utilities
             public const string getMechanicList = Base + "getMechanicList";
             public const string approvalstatus = Base + "approval-status";
             public const string getMechanicsPendingList = Base + "getMechanicsPendingList";
+            public const string getMechanicDropdownList = Base + "getMechanicDropdownList";
 
 
         }

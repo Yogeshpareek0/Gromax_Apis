@@ -87,6 +87,12 @@ namespace GromaxMobileApis.Interfaces
         Task<PdiReportResponse> getPdiReportDb(PdiReportReqModel m);
         Task<NtirReportResponse> getNtirReportDb(NtirReportReqModel m);
 
+        public Task<int> removeJobCardDraftdb(string jobCardMasterId);
+
+
+        Task<MechanicDropdownResponse> getMechanicDropdownListdb();
+
+
 
 
 

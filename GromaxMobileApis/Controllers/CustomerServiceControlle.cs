@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -915,7 +917,7 @@ namespace GromaxMobileApis.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = "Dealer")]
+        [Authorize(Roles = "Dealer,Service CCM")]
         [Route(GromaxMobileApis.Utilities.customerServices.mechanicServices.insertMechanic)]
         public async Task<IActionResult> InsertMechanic([FromBody] MechanicCreateRequest m)
         {
@@ -1137,8 +1139,71 @@ namespace GromaxMobileApis.Controllers
             }
         }
 
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.jobCard.GetJobCardPdf)]
+        public async Task<IActionResult> GetJobCardPdf(string jobCardMasterId)
+        {
+            try
+            {
+                var data = await _customerService.getJobCardByIddb(jobCardMasterId);
+                var master = data?.resJobCardMaster?.FirstOrDefault();
+                if (master == null)
+                    return NotFound(ApiResponse<string>.NotFound("Job card not found"));
+
+                byte[] pdf = new JobCardPdfGenerator().Generate(data);
+                string fileName = $"JobCard_{master.JobCardNo?.Replace("/", "_")}.pdf";
+
+                return File(pdf, "application/pdf", fileName);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse<string>.Fail("Something wrong."));
+            }
+        }
 
 
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.jobCard.removeJobCardDraft)]
+        public async Task<IActionResult> removeJobCardDraft([FromBody][Required] JobCardCancelRequestModel m)
+        {
+            try
+            {
+                var r = await _customerService.removeJobCardDraftdb(m.JobCardMasterId);
+                if (r <= 0)
+                {
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        ApiResponse<string>.Fail("Unable to Delete Job Card."));
+                }
+
+                return Ok(
+                    ApiResponse<string>.Success(
+                        "Jobcard Removed successfully."));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.mechanicServices.getMechanicDropdownList)]
+        [AllowAnonymous]
+        public async Task<IActionResult> getMechanicDropdownList()
+        {
+            try
+            {
+                var l = await _customerService.getMechanicDropdownListdb();
+                return Ok(ApiResponse<MechanicDropdownResponse>.Success(l));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
 
 
 

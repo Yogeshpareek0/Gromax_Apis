@@ -2678,21 +2678,22 @@ namespace GromaxMobileApis.Controllers
                 string Latitude = form.Latitude;
                 string Longitude = form.Longitude;
                 string Address = form.Address;
+                //string MobileNo = form.MobileNo;
                 if (string.IsNullOrEmpty(installationId))
                     return BadRequest("Error.");
 
-                if (form.installationImages == null || !form.installationImages.Any())
+                if (form.installationImages == null || form.installationImages.Count != 4)
                 {
                     return BadRequest("All images are required.");
                 }
 
-                foreach (var file in form.installationImages)
-                {
-                    if (file.Image == null || file.Image.Length == 0)
-                    {
-                        return BadRequest("All images are required.");
-                    }
-                }
+                //foreach (var file in form.installationImages)
+                //{
+                //    if (file.Image == null || file.Image.Length == 0)
+                //    {
+                //        return BadRequest("All images are required.");
+                //    }
+                //}
 
 
 
@@ -2726,7 +2727,7 @@ namespace GromaxMobileApis.Controllers
                 }
 
                 DataTable dt = GromaxMobileApis.Utilities.UtilityFunctions.ConvertListToDataTableV2(modellist);
-                var result = await _db.InsertInstallationImgv1(dt, form.WorkingHrs);
+                var result = await _db.InsertInstallationImgv1(dt, form.WorkingHrs,form.MobileNo);
 
                 return result > 0 ? Ok("Inserted successfully") : BadRequest("Insert failed.");
             }

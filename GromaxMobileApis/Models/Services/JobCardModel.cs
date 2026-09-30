@@ -248,5 +248,11 @@ namespace GromaxMobileApis.Models.Services
     }
 
 
+    public class JobCardCancelRequestModel
+    {
+        public string JobCardMasterId { get; set; }
+
+    }
+
 
 }

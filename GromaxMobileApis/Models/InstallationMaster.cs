@@ -55,6 +55,7 @@ namespace GromaxMobileApis.Models
         public string Status { get; set; }
         public string StateName { get; set; }
         public string Dealership { get; set; }
+        public string ChassisNo { get; set; }
         public string IsDownload { get; set; } = "No";
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
@@ -73,6 +74,7 @@ namespace GromaxMobileApis.Models
         public string Longitude { get; set; }
         public string Address { get; set; }
         public string WorkingHrs { get; set; }
+        public string MobileNo { get; set; } = null;
         public List<installationImage> installationImages { get; set; }
 
     }

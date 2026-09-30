@@ -43,7 +43,7 @@ namespace GromaxMobileApis.Interfaces
         Task<int> updtSalesCustomerEnquiryv2(SalesEnquiryMaster model, string p);
         Task<int> updtSalesCustomerProfile(SalesEnquiryMaster model, string p);
         Task<int> InsertInstallationImg(DataTable dt);
-        Task<int> InsertInstallationImgv1(DataTable dt, string WorkingHrs);
+        Task<int> InsertInstallationImgv1(DataTable dt, string WorkingHrs,string MobileNo);
         Task<int> InsertReturnRequestMaster(ReturnRequestMaster model);
         Task<IEnumerable<ReturnRequestMaster>> GetReturnRequestMaster(ReturnRequestMaster model);
         Task<IEnumerable<dynamic>> getSevenDaySalesEnquiryDelivery(string Mobile, string Dealercode, string username, string loginposition);

@@ -466,11 +466,11 @@ namespace GromaxMobileApis.Services
             }
         }
 
-        public async Task<int> InsertInstallationImgv1(DataTable dt, string workingHrs)
+        public async Task<int> InsertInstallationImgv1(DataTable dt, string workingHrs, string mobileNo)
         {
             try
             {
-                var parameters = new { dt = dt, workingHrs };
+                var parameters = new { dt = dt, workingHrs, mobileNo };
                 var vals = await _db.ExecuteAsync(
                 "usp_insertInstallationImgv1",
                 param: parameters,
@@ -1098,6 +1098,8 @@ namespace GromaxMobileApis.Services
                     cmd.Parameters.AddWithValue("@Status", model.Status ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@RowStart", !string.IsNullOrEmpty(model.RowStart) ? int.Parse(model.RowStart) : 0);
                     cmd.Parameters.AddWithValue("@PageSize", !string.IsNullOrEmpty(model.PageSize) ? int.Parse(model.PageSize) : 0);
+                    cmd.Parameters.AddWithValue("@ChassisNo", model.ChassisNo ?? (object)DBNull.Value);
+
 
                     var ds = new DataSet();
 

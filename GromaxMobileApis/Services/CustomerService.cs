@@ -804,8 +804,10 @@ namespace GromaxMobileApis.Services
         {
             try
             {
-                m.DealerCode = _user.GetDealerCode();
-                m.CreatedBy = _user.GetPositionName();
+                m.DealerCode = string.Equals(_user.GetPositionName(), "Dealer", StringComparison.OrdinalIgnoreCase)
+                    && !string.IsNullOrWhiteSpace(_user.GetDealerCode())
+                    ? _user.GetDealerCode() : m.DealerCode;
+                m.CreatedBy = _user.GetUserName();
                 var res = await _db.ExecuteScalarAsync<int>(
                     "USP_InsertMechanic",
                     m,
@@ -1015,5 +1017,49 @@ namespace GromaxMobileApis.Services
                 throw new Exception($"Database Error: {ex.Message}");
             }
         }
+
+        public async Task<int> removeJobCardDraftdb(string jobCardMasterId)
+        {
+            try
+            {
+                var param = new { username = _user.GetUserName(), loginas = _user.GetPositionName(), jobCardMasterId = Guid.Parse(jobCardMasterId) };
+                var res = await _db.ExecuteScalarAsync<int>(
+                    "USP_removeJobCardDraft",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
+
+        public async Task<MechanicDropdownResponse> getMechanicDropdownListdb()
+        {
+            try
+            {
+                using (var multi = await _db.QueryMultipleAsync("USP_getMechanicDropdownList", commandType: CommandType.StoredProcedure))
+                {
+                    var ServiceManagerList = await multi.ReadAsync();
+                    var SkillLevelList = await multi.ReadAsync();
+
+                    return new MechanicDropdownResponse
+                    {
+                        ServiceManagerList = ServiceManagerList,
+                        SkillLevelList = SkillLevelList
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
+
     }
 }
