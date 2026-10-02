@@ -1,5 +1,7 @@
-﻿using Google.Apis.Util;
+﻿using Azure;
+using Google.Apis.Util;
 using GromaxMobileApis.Interfaces;
+using GromaxMobileApis.Models;
 using GromaxMobileApis.Models.DealerMaster;
 using GromaxMobileApis.Models.Services;
 using GromaxMobileApis.Models.VerifyWebhook;
@@ -34,10 +36,12 @@ namespace GromaxMobileApis.Controllers
         private getFileName _getFileName;
         private IAzureStorageService _azure;
         private readonly ServiceInvoicePdfGenerator _pdfGenerator;
+        private readonly JobCardPdfGenerator _JobCardpdfGenerator;
         private readonly ILogger<CustomerServiceControlle> _logger;
         private readonly IDatabaseService _db;
         public CustomerServiceControlle(ICustomerService customerService, getFileName getFileName,
-            IAzureStorageService azure, ILogger<CustomerServiceControlle> logger, ServiceInvoicePdfGenerator serviceInvoice, IDatabaseService databaseService)
+            IAzureStorageService azure, ILogger<CustomerServiceControlle> logger, ServiceInvoicePdfGenerator serviceInvoice,
+            IDatabaseService databaseService, JobCardPdfGenerator jobCardpdfGenerator)
         {
             _customerService = customerService;
             _getFileName = getFileName;
@@ -45,6 +49,7 @@ namespace GromaxMobileApis.Controllers
             _logger = logger;
             _pdfGenerator = serviceInvoice;
             _db = databaseService;
+            _JobCardpdfGenerator = jobCardpdfGenerator;
         }
         [HttpGet]
         [Route(GromaxMobileApis.Utilities.customerServices.pdiList)]
@@ -276,7 +281,7 @@ namespace GromaxMobileApis.Controllers
             try
             {
                 var l = await _customerService.jobCardReportdb(m);
-                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(l));
+                return Ok(ApiResponse<JObCardReportResponse>.Success(l));
             }
             catch (Exception ex)
             {
@@ -1139,21 +1144,28 @@ namespace GromaxMobileApis.Controllers
             }
         }
 
-        [HttpGet]
-        [Route(GromaxMobileApis.Utilities.customerServices.jobCard.GetJobCardPdf)]
-        public async Task<IActionResult> GetJobCardPdf(string jobCardMasterId)
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.jobCard.addJobCardPdf)]
+        public async Task<IActionResult> addJobCardPdf([FromQuery][Required] string jobCardMasterId)
         {
             try
             {
                 var data = await _customerService.getJobCardByIddb(jobCardMasterId);
                 var master = data?.resJobCardMaster?.FirstOrDefault();
+                var URL = master.pdfURL;
+
                 if (master == null)
                     return NotFound(ApiResponse<string>.NotFound("Job card not found"));
 
-                byte[] pdf = new JobCardPdfGenerator().Generate(data);
-                string fileName = $"JobCard_{master.JobCardNo?.Replace("/", "_")}.pdf";
+                if (!string.IsNullOrEmpty(URL))
+                    return StatusCode(500, ApiResponse<string>.Fail("Job card URL already exists"));
 
-                return File(pdf, "application/pdf", fileName);
+                string path = await _JobCardpdfGenerator.GenerateAndSave(data, "JobCardPdf");
+                int res = await _customerService.updateJobCardPdfURLdb(jobCardMasterId, path);
+                if (res > 0)
+                    return Ok(ApiResponse<string>.Success(path));
+                else
+                    return NotFound(ApiResponse<string>.NotFound("Job card not found"));
             }
             catch
             {
@@ -1206,6 +1218,60 @@ namespace GromaxMobileApis.Controllers
         }
 
 
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.jobCard.GetJobCardPdf)]
+        public async Task<IActionResult> GetJobCardPdf(string jobCardMasterId)
+        {
+            try
+            {
+                var data = await _customerService.getJobCardByIddb(jobCardMasterId);
+                var master = data?.resJobCardMaster?.FirstOrDefault();
+                if (master == null)
+                    return NotFound(ApiResponse<string>.NotFound("Job card not found"));
+
+                byte[] pdf = _JobCardpdfGenerator.Generate(data);
+                string fileName = $"JobCard_{master.JobCardNo?.Replace("/", "_")}.pdf";
+
+                return File(pdf, "application/pdf", fileName);
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse<string>.Fail("Something wrong."));
+            }
+        }
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.ApiRoutes.InstallationMaster.updateInstallationApproval)]
+        public async Task<IActionResult> updateInstallationApproval(
+     [FromBody] InstallationApprovalRequest m)
+        {
+            try
+            {
+                var r = await _customerService.updateInstallationApprovaldb(m);
+
+                if (r <= 0)
+                {
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        ApiResponse<string>.Fail(
+                            "Unable to update installation approval status."));
+                }
+
+                string message = m.ApprovalStatus == 1
+                    ? "Installation approved successfully."
+                    : "Installation rejected successfully.";
+
+                return Ok(ApiResponse<string>.Success(message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(
+                        "An error occurred while updating the installation approval status."));
+            }
+        }
 
 
 

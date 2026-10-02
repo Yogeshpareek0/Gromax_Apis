@@ -101,6 +101,7 @@ namespace GromaxMobileApis.Utilities
             public const string InsertImgv1 = HomeBase + "InsertInstallationImgv1";
             //public const string InsertImg = HomeBase + "InsertInstallationImg";
             public const string GetImages = HomeBase + "GetImagesOnId";
+            public const string updateInstallationApproval = HomeBase + "updateInstallationApproval";
         }
 
         public static class Other
@@ -248,6 +249,7 @@ namespace GromaxMobileApis.Utilities
             public const string getPendingConversionByList = HomeBase + "getPendingConversionByList";
             public const string getIndustryByTaluka = HomeBase + "getIndustryByTaluka";
             public const string updtConversionBy = HomeBase + "updtConversionBy";
+            public const string CheckNDAEnquiryMobile = HomeBase + "CheckNDAEnquiryMobile";
 
         }
 
@@ -429,6 +431,8 @@ namespace GromaxMobileApis.Utilities
             public const string getOpenJobCard = Base + "getOpenJobCard";
             public const string getFreeServiceClosedJobCard = Base + "getFreeServiceClosedJobCard";
             public const string GetJobCardPdf = Base + "GetJobCardPdf";
+            public const string addJobCardPdf = Base + "addJobCardPdf";
+
             public const string removeJobCardDraft = Base + "removeJobCardDraft";
 
 

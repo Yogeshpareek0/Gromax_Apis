@@ -134,6 +134,7 @@ namespace GromaxMobileApis
             services.AddScoped<getFileName>();
             services.AddScoped<DapperParameterHelper>();
             services.AddScoped<ServiceInvoicePdfGenerator>();
+            services.AddScoped<JobCardPdfGenerator>();
             services.AddScoped<IUser, User>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddSwaggerDocumentation();

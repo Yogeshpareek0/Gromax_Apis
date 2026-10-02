@@ -1,4 +1,5 @@
-﻿using GromaxMobileApis.Models.DealerMaster;
+﻿using GromaxMobileApis.Models;
+using GromaxMobileApis.Models.DealerMaster;
 using GromaxMobileApis.Models.Services;
 using GromaxMobileApis.Models.VerifyWebhook;
 using System;
@@ -22,7 +23,7 @@ namespace GromaxMobileApis.Interfaces
         Task<int> addJobCard(AddJobCardRequest m);
 
         Task<IEnumerable<dynamic>> GetServiceTimelinedb(Guid salesMasterId);
-        Task<IEnumerable<dynamic>> jobCardReportdb(JobCardMasterReportRequest m);
+        Task<JObCardReportResponse> jobCardReportdb(JobCardMasterReportRequest m);
         Task<int> addOnlineEnqdb(VerifyWebhook m);
 
         Task<ResponseJobCardMaster> getJobCardByIddb(string jobCardMasterId);
@@ -91,6 +92,12 @@ namespace GromaxMobileApis.Interfaces
 
 
         Task<MechanicDropdownResponse> getMechanicDropdownListdb();
+
+        Task<int> updateJobCardPdfURLdb(string jobCardMasterId, string path);
+
+        public Task<int> updateInstallationApprovaldb(InstallationApprovalRequest m);
+
+
 
 
 

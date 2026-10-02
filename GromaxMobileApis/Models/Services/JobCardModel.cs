@@ -71,6 +71,7 @@ namespace GromaxMobileApis.Models.Services
         public DateTime? ModifiedDate { get; set; }
         public string ModifiedBy { get; set; }
         public string PlatformType { get; set; }
+        public string pdfURL { get; set; }
 
         // Child Collections
         public List<JobCardComplaint> Complaints { get; set; } = new();
@@ -254,5 +255,12 @@ namespace GromaxMobileApis.Models.Services
 
     }
 
+
+    public class JObCardReportResponse
+    {
+        public IEnumerable<dynamic> report { get; set; }
+        public dynamic count { get; set; }
+
+    }
 
 }

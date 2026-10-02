@@ -169,6 +169,7 @@ namespace GromaxMobileApis.Interfaces
 
 
         Task<IEnumerable<sourceSubSourceMaster>> getNDASourceSubSourcedb();
+        Task<bool> CheckNDAEnquiryMobileDb(string MobileNo);
 
 
 

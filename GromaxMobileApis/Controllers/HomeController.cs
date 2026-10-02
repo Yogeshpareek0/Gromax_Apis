@@ -10,12 +10,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor.Internal;
+using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime.Workdays;
 using OfficeOpenXml.Style.XmlAccess;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
@@ -2727,7 +2729,7 @@ namespace GromaxMobileApis.Controllers
                 }
 
                 DataTable dt = GromaxMobileApis.Utilities.UtilityFunctions.ConvertListToDataTableV2(modellist);
-                var result = await _db.InsertInstallationImgv1(dt, form.WorkingHrs,form.MobileNo);
+                var result = await _db.InsertInstallationImgv1(dt, form.WorkingHrs, form.MobileNo);
 
                 return result > 0 ? Ok("Inserted successfully") : BadRequest("Insert failed.");
             }
@@ -2908,7 +2910,22 @@ namespace GromaxMobileApis.Controllers
             }
         }
 
-
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.ApiRoutes.NDAForm.CheckNDAEnquiryMobile)]
+        public async Task<IActionResult> CheckNDAEnquiryMobile([FromQuery][Required] string mobileNo)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(mobileNo) || mobileNo.Length != 10)
+                    return BadRequest(ApiResponse<string>.BadRequest("Please provide a valid 10-digit mobile number."));
+                var result = await _db.CheckNDAEnquiryMobileDb(mobileNo);
+                return Ok(ApiResponse<bool>.Success(result));
+            }
+            catch (Exception Ex)
+            {
+                return Ok(ApiResponse<string>.Fail(Ex.Message));
+            }
+        }
 
     }
 

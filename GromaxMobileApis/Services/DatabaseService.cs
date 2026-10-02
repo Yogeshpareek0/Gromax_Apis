@@ -2917,5 +2917,17 @@ namespace GromaxMobileApis.Services
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
+        public async Task<bool> CheckNDAEnquiryMobileDb(string MobileNo)
+        {
+            try
+            {
+                var param = new { MobileNo };
+                var result = await _db.ExecuteScalarAsync<int>("usp_CheckDuplicateNDAEnquiryByMobile", param: param, commandType: CommandType.StoredProcedure);
+                if (result == 0)
+                    return false;
+                return true;
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using GromaxMobileApis.Models.Services;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Document = iTextSharp.text.Document;
 using Font = iTextSharp.text.Font;
 using Rectangle = iTextSharp.text.Rectangle;
@@ -15,8 +17,16 @@ namespace GromaxMobileApis.Utilities
     /// <summary>
     /// Job Card print PDF - existing ResponseJobCardMaster model se
     /// </summary>
+    /// 
+
     public class JobCardPdfGenerator
     {
+
+        private readonly getFileName _upload;
+        public JobCardPdfGenerator(getFileName upload)
+        {
+            _upload = upload;
+        }
         // ============ COLORS ============
         private static readonly BaseColor HEADER_BLUE = new BaseColor(49, 142, 194);
         private static readonly BaseColor HEADER_BLUE_DARK = new BaseColor(37, 110, 153);
@@ -70,6 +80,29 @@ namespace GromaxMobileApis.Utilities
                                        BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
         }
 
+
+
+
+        public async Task<string> GenerateAndSave(ResponseJobCardMaster response, string fileName = null)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new Exception("File name is required.");
+
+            string finalFileName = $"{fileName}";
+
+            byte[] pdfBytes = Generate(response);
+
+            var stream = new MemoryStream(pdfBytes);
+            var formFile = new FormFile(stream, 0, pdfBytes.Length, "file", finalFileName)
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = "application/pdf"
+            };
+
+            string fullPath = await _upload._getFileNamev1(formFile, finalFileName);
+            return fullPath;
+        }
+
         // ============ PUBLIC ============
 
         public byte[] Generate(ResponseJobCardMaster data)
@@ -100,7 +133,7 @@ namespace GromaxMobileApis.Utilities
                 AddSpacing(doc, 8);
                 AddTyrePressure(doc, m);
 
-                
+
 
                 AddSpacing(doc, 8);
                 AddComplaints(doc, complaints);
@@ -198,7 +231,7 @@ namespace GromaxMobileApis.Utilities
             doc.Add(t);
         }
 
-        
+
         private void AddComplaints(Document doc, List<JobCardComplaint> list)
         {
             var t = new PdfPTable(new float[] { 5, 37, 37, 21 }) { WidthPercentage = 100, HeaderRows = 2 };

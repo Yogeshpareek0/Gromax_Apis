@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 #nullable disable
 
@@ -84,6 +85,30 @@ namespace GromaxMobileApis.Models
         public string TagName { get; set; }
         public IFormFile Image { get; set; }
 
+
+    }
+
+
+    public class InstallationApprovalRequest : IValidatableObject
+    {
+        [Required]
+        public string InstallationId { get; set; }
+        [RegularExpression("^-1$|^1$", ErrorMessage = "ApprovalStatus must be either Approved or Rejected.")]
+        public int ApprovalStatus { get; set; }
+        [MaxLength(100, ErrorMessage = "Remark cannot exceed 100 characters.")]
+        public string Remark { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(
+        ValidationContext validationContext)
+        {
+            if (ApprovalStatus == -1 && string.IsNullOrWhiteSpace(Remark))
+            {
+                yield return new ValidationResult(
+                    "Remark is required when the installation is rejected.",
+                    new[] { nameof(Remark) }
+                );
+            }
+        }
 
     }
 }

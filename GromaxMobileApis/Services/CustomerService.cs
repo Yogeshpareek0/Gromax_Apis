@@ -1,9 +1,11 @@
 ﻿using Azure.Storage.Blobs.Models;
 using Dapper;
 using GromaxMobileApis.Interfaces;
+using GromaxMobileApis.Models;
 using GromaxMobileApis.Models.DealerMaster;
 using GromaxMobileApis.Models.Services;
 using GromaxMobileApis.Models.VerifyWebhook;
+using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -220,7 +222,7 @@ namespace GromaxMobileApis.Services
             }
         }
 
-        public async Task<IEnumerable<dynamic>> jobCardReportdb(JobCardMasterReportRequest m)
+        public async Task<JObCardReportResponse> jobCardReportdb(JobCardMasterReportRequest m)
         {
             try
             {
@@ -235,11 +237,21 @@ namespace GromaxMobileApis.Services
                     m.EnDate,
                     m.JobType
                 };
-                var vals = await _db.QueryAsync(
+                using var multi = await _db.QueryMultipleAsync(
                 "usp_jobCardMasterReport",
                 param,
-                commandType: CommandType.StoredProcedure);
-                return vals;
+                commandType: CommandType.StoredProcedure
+                );
+
+                var report = await multi.ReadAsync<dynamic>();
+
+                var count = await multi.ReadAsync<dynamic>();
+
+                return new JObCardReportResponse
+                {
+                    report = report,
+                    count = count
+                };
             }
             catch (Exception ex)
             {
@@ -1060,6 +1072,40 @@ namespace GromaxMobileApis.Services
             }
         }
 
+        public async Task<int> updateJobCardPdfURLdb(string jobCardMasterId, string p)
+        {
+            try
+            {
+                var param = new { jobCardMasterId = Guid.Parse(jobCardMasterId), pdfURL = p };
+                var res = await _db.ExecuteScalarAsync<int>(
+                    "USP_addJobCardPdfURL",
+                    param,
+                    commandType: CommandType.StoredProcedure);
 
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
+        public async Task<int> updateInstallationApprovaldb(InstallationApprovalRequest m)
+        {
+            try
+            {
+                var param = new { m.ApprovalStatus, m.Remark, InstallationId = Guid.Parse(m.InstallationId), Username = _user.GetUserName() };
+                var res = await _db.ExecuteScalarAsync<int>(
+                    "USP_updateInstallationApproval",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
     }
 }
