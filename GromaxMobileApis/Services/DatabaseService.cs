@@ -2929,5 +2929,29 @@ namespace GromaxMobileApis.Services
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
+
+        public async Task<dynamic> getDealerProfileDb()
+        {
+            try
+            {
+                var param = new { dealerCode = _user.GetDealerCode() };
+                var result = await _db.QuerySingleOrDefaultAsync<dynamic>("usp_getProfile", param: param, commandType: CommandType.StoredProcedure);
+                return result;
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
+
+        public async Task<bool> addDerlerSignatureDb(AddDealerSignature m)
+        {
+            try
+            {
+                var param = new { dealerCode = m.dealerCode, signatureURL = m.signatureURL };
+                var result = await _db.ExecuteScalarAsync<int>("usp_addDealerSignature", param: param, commandType: CommandType.StoredProcedure);
+                if (result > 0)
+                    return true;
+                return false;
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
     }
 }

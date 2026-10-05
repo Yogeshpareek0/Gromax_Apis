@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -136,6 +137,14 @@ namespace GromaxMobileApis.Models.DealerMaster
         [Required(ErrorMessage = "Village Code is required.")]
         public int VillageCode { get; set; }
         public string OtherLocation { get; set; }
+    }
+
+    public class AddDealerSignature
+    {
+        public string dealerCode { get; set; } = null;
+        public string signatureURL { get; set; } = null;
+        [Required(ErrorMessage = "Signature file is required.")]
+        public IFormFile signatureFile { get; set; }
     }
 
 }

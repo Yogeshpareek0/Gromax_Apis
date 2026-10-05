@@ -2927,6 +2927,61 @@ namespace GromaxMobileApis.Controllers
             }
         }
 
+
+        [HttpGet]
+        [Authorize(Roles = "Dealer")]
+        [Route(GromaxMobileApis.Utilities.ApiRoutes.Other.getDealerProfile)]
+        public async Task<IActionResult> getDealerProfile()
+        {
+            try
+            {
+                var result = await _db.getDealerProfileDb();
+                return Ok(ApiResponse<dynamic>.Success(result));
+            }
+            catch (Exception Ex)
+            {
+                return Ok(ApiResponse<string>.Fail(Ex.Message));
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Dealer")]
+        [Route(GromaxMobileApis.Utilities.ApiRoutes.Other.addDealerSignature)]
+
+        public async Task<IActionResult> addDealerSignature([FromForm] AddDealerSignature m)
+        {
+            try
+            {
+                var allowedExtensions = new HashSet<string>(
+                StringComparer.OrdinalIgnoreCase)
+                {
+                    ".jpg",
+                    ".jpeg",
+                    ".png"
+                };
+
+                var extension = Path.GetExtension(m.signatureFile.FileName);
+
+                if (string.IsNullOrWhiteSpace(extension) ||
+                    !allowedExtensions.Contains(extension))
+                {
+                    return BadRequest("Only JPG, JPEG and PNG files are allowed.");
+                }
+                m.dealerCode = User.FindFirst("dealercode")?.Value;
+                m.signatureURL = await _getFilename._getFileNamev1(m.signatureFile, m.dealerCode + "_signature");
+                //m.signatureURL = "https://loadinfotechdb.blob.core.windows.net/gromaxwebprod1/SS881signature_9148e0f2729d462389a9479259c9490d_20261005125302484.png";
+                var result = await _db.addDerlerSignatureDb(m);
+                if (result)
+                    return Ok(ApiResponse<string>.Success(m.signatureURL));
+                return NotFound(ApiResponse<string>.NotFound("Record not found."));
+            }
+            catch (Exception Ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(Ex.Message));
+            }
+
+        }
+
     }
 
 

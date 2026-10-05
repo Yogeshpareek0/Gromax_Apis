@@ -15,6 +15,7 @@ using System.Xml.Linq;
 using Document = iTextSharp.text.Document;
 using Font = iTextSharp.text.Font;
 using Rectangle = iTextSharp.text.Rectangle;
+using System.Net.Http;
 
 namespace GromaxMobileApis.Utilities
 {
@@ -23,6 +24,8 @@ namespace GromaxMobileApis.Utilities
     /// Proper spacing between sections, aligned invoice meta, normal font sizes.
     /// Chassis service history 2nd page me tabular format me - SINGLE ROW PER CHASSIS
     /// </summary>
+    /// 
+
     public class ServiceInvoicePdfGenerator
     {
         private readonly getFileName _upload;
@@ -31,6 +34,9 @@ namespace GromaxMobileApis.Utilities
         {
             _upload = upload;
         }
+
+        private static readonly HttpClient _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+
 
         // Colors
         private static readonly BaseColor HEADER_BLUE = new BaseColor(49, 142, 194);
@@ -147,6 +153,8 @@ namespace GromaxMobileApis.Utilities
                 writer.CompressionLevel = 9;
                 writer.PdfVersion = PdfWriter.VERSION_1_5;
 
+
+                var signatureImage = await LoadSignatureImageAsync(invoice.signatureUrl);
                 doc.Open();
 
                 // PAGE 1: Invoice
@@ -163,7 +171,7 @@ namespace GromaxMobileApis.Utilities
                 AddSpacing(doc, 6);
                 AddNote(doc, invoice);
                 AddSpacing(doc, 4);
-                AddDeclaration(doc);
+                AddDeclaration(doc, signatureImage);
 
                 // PAGE 2: Service History (agar hours data available ho)
                 if (hoursData?.Count > 0)
@@ -560,7 +568,7 @@ namespace GromaxMobileApis.Utilities
             doc.Add(table);
         }
 
-        private void AddDeclaration(Document doc)
+        private void AddDeclaration(Document doc, iTextSharp.text.Image signatureImage)
         {
             var table = new PdfPTable(1) { WidthPercentage = 100, SpacingBefore = 0, SpacingAfter = 0 };
 
@@ -574,14 +582,46 @@ namespace GromaxMobileApis.Utilities
             };
             table.AddCell(declCell);
 
-            var sigCell = new PdfPCell(new Phrase("Authorised Signatory : Dealer signature", FontLine))
+            // Signature block - right aligned
+            var sigCell = new PdfPCell
             {
                 Border = Rectangle.LEFT_BORDER | Rectangle.RIGHT_BORDER | Rectangle.BOTTOM_BORDER,
                 BorderColor = BORDER,
-                Padding = 5
+                PaddingTop = 6,
+                PaddingBottom = 6,
+                PaddingLeft = 5,
+                PaddingRight = 15,
+                MinimumHeight = 65
             };
-            table.AddCell(sigCell);
 
+            if (signatureImage != null)
+            {
+                // Chunk me wrap kiya taki image cell width me stretch na ho
+                var imgPara = new Paragraph(new Chunk(signatureImage, 0, 0, true))
+                {
+                    Alignment = Element.ALIGN_RIGHT
+                };
+                sigCell.AddElement(imgPara);
+
+                sigCell.AddElement(new Paragraph("(Digitally Signed)", FontDeclaration)
+                {
+                    Alignment = Element.ALIGN_RIGHT,
+                    SpacingBefore = 1
+                });
+            }
+            else
+            {
+                // Signature nahi hai to blank space manual sign ke liye
+                sigCell.AddElement(new Paragraph(" ", FontLine) { SpacingAfter = 30 });
+            }
+
+            sigCell.AddElement(new Paragraph("Authorised Signatory : Dealer Signature", FontLineBold)
+            {
+                Alignment = Element.ALIGN_RIGHT,
+                SpacingBefore = 2
+            });
+
+            table.AddCell(sigCell);
             doc.Add(table);
         }
 
@@ -741,6 +781,31 @@ namespace GromaxMobileApis.Utilities
 
             doc.Add(table);
         }
+
+        private async Task<iTextSharp.text.Image> LoadSignatureImageAsync(string signatureUrl)
+        {
+            if (string.IsNullOrWhiteSpace(signatureUrl)) return null;
+
+            try
+            {
+                byte[] bytes = null;
+
+                if (signatureUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                    bytes = await _httpClient.GetByteArrayAsync(signatureUrl);
+                else if (File.Exists(signatureUrl))
+                    bytes = await File.ReadAllBytesAsync(signatureUrl);
+
+                if (bytes == null || bytes.Length == 0) return null;
+
+                var img = iTextSharp.text.Image.GetInstance(bytes);
+                img.ScaleToFit(110f, 40f);   // max width 110, max height 40 (ratio maintain)
+                return img;
+            }
+            catch
+            {
+                return null; // signature na mile to bhi PDF generate ho
+            }
+        }
     }
 
     /// <summary>
@@ -802,5 +867,7 @@ namespace GromaxMobileApis.Utilities
             if (number < 20) return Ones[number];
             return (Tens[number / 10] + " " + Ones[number % 10]).Trim();
         }
+
+        
     }
 }

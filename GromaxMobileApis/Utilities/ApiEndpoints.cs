@@ -116,6 +116,8 @@ namespace GromaxMobileApis.Utilities
             public const string getbillingReqData = HomeBase + "getbillingReqData";
             public const string getDealerByTehsil = HomeBase + "getDealerByTehsil";
             public const string imageSave = HomeBase + "imageSave";
+            public const string getDealerProfile = HomeBase + "getDealerProfile";
+            public const string addDealerSignature = HomeBase + "addDealerSignature";
 
             //public const string GetStateListByLogin = HomeBase + "GetStateListByLogin";
         }

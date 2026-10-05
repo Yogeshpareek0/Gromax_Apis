@@ -58,6 +58,7 @@ namespace GromaxMobileApis.Models.Services
         public string DealerLocation { get; set; }
         public string GstHeader { get; set; }
         public string Claims { get; set; }
+        public string signatureUrl { get; set; }
 
         /// <summary>
         /// Abhi ke liye static company/consignee details is model me bhar deta hai.
