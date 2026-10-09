@@ -1,10 +1,15 @@
-﻿namespace GromaxMobileApis.Utilities
+﻿using FirebaseAdmin;
+
+namespace GromaxMobileApis.Utilities
 {
     public class ApiResponse<T>
     {
         public int StatusCode { get; set; }
         public string Message { get; set; }
         public T Data { get; set; }
+
+        public string ErrorCode { get; set; } = string.Empty;
+
 
 
         //in case of check exist or not exists response will be
@@ -50,6 +55,16 @@
         public static ApiResponse<T> Fail(string message, int statusCode = 500)
         {
             return new ApiResponse<T> { StatusCode = statusCode, Message = message, Data = default };
+        }
+
+        public static ApiResponse<T> ErrorWithErrorCode(string message, int statusCode = 500, string ErrorCode = null)
+        {
+            return new ApiResponse<T> { StatusCode = statusCode, Message = message, ErrorCode = ErrorCode };
+        }
+
+        public static ApiResponse<T> SqlExceptionWithErrorCode(string message)
+        {
+            return new ApiResponse<T> { StatusCode = 500, Message = message, ErrorCode = "500001" };
         }
     }
 

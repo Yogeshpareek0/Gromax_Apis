@@ -9,6 +9,7 @@ using GromaxMobileApis.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
@@ -18,6 +19,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -25,6 +27,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using static GromaxMobileApis.Models.Services.FieldTechnicalReportModel;
 
 namespace GromaxMobileApis.Controllers
 {
@@ -720,6 +723,7 @@ namespace GromaxMobileApis.Controllers
             try
             {
                 DataTable dt = new DataTable();
+                var res = string.Empty;
                 try
                 {
                     dt = UtilityFunctions.ConvertIdsToDataTable(Ids);
@@ -728,7 +732,16 @@ namespace GromaxMobileApis.Controllers
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, ApiResponse<string>.Fail(ex.Message));
                 }
-                var res = await _customerService.generateServiceInvoicedb(dt);
+
+                try
+                {
+                    res = await _customerService.generateServiceInvoicedb(dt);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.ErrorWithErrorCode(ex.Message, 500, "500002"));
+                }
+
                 if (!string.IsNullOrWhiteSpace(res))
                 {
                     var invoiceModel = await _customerService.getServiceInvByIddb(Guid.Parse(res), dt);
@@ -823,7 +836,16 @@ namespace GromaxMobileApis.Controllers
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, ApiResponse<string>.Fail(ex.Message));
                 }
-                var res = await _customerService.generateInstallationInvoicedb(dt);
+                var res = string.Empty;
+                try
+                {
+                    res = await _customerService.generateInstallationInvoicedb(dt);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.ErrorWithErrorCode(ex.Message, 500, "500002"));
+                }
+
                 if (!string.IsNullOrWhiteSpace(res))
                 {
                     var invoiceModel = await _customerService.getServiceInvByIddb(Guid.Parse(res), dt);
@@ -1274,6 +1296,52 @@ namespace GromaxMobileApis.Controllers
         }
 
 
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.FTR.GetChassisDetailsForFTR)]
+        public async Task<IActionResult> GetChassisDetailsForFTR([FromQuery][Required] string stockStatus = "IN")
+        {
+            try
+            {
+                IEnumerable<GetChassisForFTRResponseModel> data = await _customerService.GetChassisDetailsForFTRdb(stockStatus);
+                return Ok(ApiResponse<IEnumerable<GetChassisForFTRResponseModel>>.Success(data));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ApiResponse<string>.Fail("Something wrong."));
+            }
+        }
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.FTR.addFTR)]
+        public async Task<IActionResult> addFTR([FromBody] AddFieldTechRequestModel m)
+        {
+            try
+            {
+                int result = 0;
+                try
+                {
+                    result = await _customerService.addFTRdb(m);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex?.Number == 500001)
+                    {
+                        return StatusCode(500, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+
+                    }
+                }
+                if (result > 0)
+                    return Ok(ApiResponse<string>.Created());
+                return NotFound(ApiResponse<string>.NotFound("Record not found."));
+
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse<string>.Fail("Something Wrong"));
+            }
+        }
 
 
 

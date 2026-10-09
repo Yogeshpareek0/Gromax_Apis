@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.Threading.Tasks;
+using static GromaxMobileApis.Models.Services.FieldTechnicalReportModel;
 
 namespace GromaxMobileApis.Interfaces
 {
@@ -96,6 +97,10 @@ namespace GromaxMobileApis.Interfaces
         Task<int> updateJobCardPdfURLdb(string jobCardMasterId, string path);
 
         public Task<int> updateInstallationApprovaldb(InstallationApprovalRequest m);
+
+        Task<IEnumerable<GetChassisForFTRResponseModel>> GetChassisDetailsForFTRdb(string m);
+        Task<int> addFTRdb(AddFieldTechRequestModel m);
+
 
 
 

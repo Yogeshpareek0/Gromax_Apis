@@ -17,6 +17,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using static GromaxMobileApis.Models.Services.FieldTechnicalReportModel;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace GromaxMobileApis.Services
@@ -644,7 +645,7 @@ namespace GromaxMobileApis.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Database Error: {ex.Message}");
+                throw;
             }
         }
 
@@ -739,7 +740,7 @@ namespace GromaxMobileApis.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Database Error: {ex.Message}");
+                throw;
             }
         }
 
@@ -1105,6 +1106,42 @@ namespace GromaxMobileApis.Services
             catch (Exception ex)
             {
                 throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
+        public async Task<IEnumerable<GetChassisForFTRResponseModel>> GetChassisDetailsForFTRdb(string m)
+        {
+            try
+            {
+                var Param = new { username = _user.GetUserName(), positionName = _user.GetPositionName(), stockStatus = m };
+                var res = await _db.QueryAsync<GetChassisForFTRResponseModel>(
+                  "usp_GetChassisDetailsForFTR",
+                  param: Param,
+                  commandType: CommandType.StoredProcedure);
+                return res;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> addFTRdb(AddFieldTechRequestModel m)
+        {
+            try
+            {
+                m.DealerCode = _user.GetDealerCode();
+                var res = await _db.ExecuteScalarAsync<int>(
+                    "usp_InsertFieldTech",
+                    m,
+                    commandType: CommandType.StoredProcedure);
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
     }

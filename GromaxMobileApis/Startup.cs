@@ -125,6 +125,7 @@ namespace GromaxMobileApis
             services.AddScoped<IDbConnection>(sp =>
  new SqlConnection(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IDatabaseService, DatabaseService>();
+            services.AddScoped<ICircularService, CircularService>();
             services.AddScoped<IDatabaseServicesweb, DatabaseServicesweb>();
             services.AddScoped<ResponseClass>();
             services.AddScoped<IAzureStorageService, AzureStorageService>();

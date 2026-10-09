@@ -266,6 +266,17 @@ namespace GromaxMobileApis.Utilities
             public const string getEmployeeListByPosition = HomeBase + "getEmployeeListByPosition";
 
         }
+        public static class Circular
+        {
+            public const string getCircularsList = "Api/Circulars/getCircularsList";
+            public const string addCirculars = "Api/Circulars/addCirculars";
+            public const string getCircularDetails = "Api/Circulars/getCircularDetails";
+            public const string getCircularDetails_app = "Api/Circulars/getCircularDetails-app";
+            public const string updateCircular = "Api/Circulars/updateCircular";
+            public const string dropDownList = "Api/Circulars/dropDownList";
+            //public const string updateCircularSentStatus = "Api/Circulars/updateCircularSentStatus";
+            //public const string getMsgSentReport = "Api/Circulars/getMsgSentReport";
+        }
     }
 
 
@@ -472,6 +483,13 @@ namespace GromaxMobileApis.Utilities
 
 
         }
+        public static class FTR
+        {
+            public const string GetChassisDetailsForFTR = Base + "GetChassisDetailsForFTR";
+            public const string addFTR = Base + "addFTR";
+
+        }
+
 
 
 
