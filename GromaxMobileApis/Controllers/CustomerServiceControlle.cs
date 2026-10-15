@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
@@ -929,11 +930,11 @@ namespace GromaxMobileApis.Controllers
 
         [HttpGet]
         [Route(GromaxMobileApis.Utilities.customerServices.reimbursement.getReimbursementList)]
-        public async Task<IActionResult> getReimbursementList()
+        public async Task<IActionResult> getReimbursementList([FromQuery][Required] string dealerCode)
         {
             try
             {
-                var l = await _customerService.getReimbursementListdb();
+                var l = await _customerService.getReimbursementListdb(dealerCode);
                 return Ok(ApiResponse<IEnumerable<ReimbursementScoreMasterModel>>.Success(l));
             }
             catch (Exception ex)
@@ -1095,7 +1096,16 @@ namespace GromaxMobileApis.Controllers
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, ApiResponse<string>.BadRequest("Unable to proceed dt conversion."));
                 }
-                var r = await _customerService.insertReimbursementScoreDb(m, dataTables);
+                int r = 0;
+                try
+                {
+                    r = await _customerService.insertReimbursementScoreDb(m, dataTables);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex.Number == 500001)
+                        return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+                }
                 if (r <= 0)
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail("Unable to Add Reimbursement Score."));
@@ -1299,11 +1309,11 @@ namespace GromaxMobileApis.Controllers
 
         [HttpGet]
         [Route(GromaxMobileApis.Utilities.customerServices.FTR.GetChassisDetailsForFTR)]
-        public async Task<IActionResult> GetChassisDetailsForFTR([FromQuery][Required] string stockStatus = "IN")
+        public async Task<IActionResult> GetChassisDetailsForFTR([FromQuery] GetFTRAllDataRequestModel m)
         {
             try
             {
-                IEnumerable<GetChassisForFTRResponseModel> data = await _customerService.GetChassisDetailsForFTRdb(stockStatus);
+                IEnumerable<GetChassisForFTRResponseModel> data = await _customerService.GetChassisDetailsForFTRdb(m);
                 return Ok(ApiResponse<IEnumerable<GetChassisForFTRResponseModel>>.Success(data));
             }
             catch (Exception ex)
@@ -1315,6 +1325,7 @@ namespace GromaxMobileApis.Controllers
 
         [HttpPost]
         [Route(GromaxMobileApis.Utilities.customerServices.FTR.addFTR)]
+        [Authorize(Roles = "Dealer")]
         public async Task<IActionResult> addFTR([FromBody] AddFieldTechRequestModel m)
         {
             try
@@ -1342,6 +1353,68 @@ namespace GromaxMobileApis.Controllers
                 return StatusCode(500, ApiResponse<string>.Fail("Something Wrong"));
             }
         }
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.FTR.updateFTR)]
+        [Authorize(Roles = "Service CCM")]
+        public async Task<IActionResult> updateFTR([FromBody] UpdateFTRRequestModel m)
+        {
+            try
+            {
+                int result = 0;
+                try
+                {
+                    result = await _customerService.updateFTRdb(m);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex?.Number == 500001)
+                    {
+                        return StatusCode(500, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+
+                    }
+                }
+                if (result > 0)
+                    return Ok(ApiResponse<string>.Created());
+                return NotFound(ApiResponse<string>.NotFound("Record not found."));
+
+            }
+            catch
+            {
+                return StatusCode(500, ApiResponse<string>.Fail("Something Wrong"));
+            }
+        }
+
+        //[HttpGet]
+        //[Route(GromaxMobileApis.Utilities.customerServices.FTR.getFTRById)]
+        //public async Task<IActionResult> getFTRById([FromQuery][Required] Guid id)
+        //{
+        //    try
+        //    {
+        //        var l = await _customerService.getFtrById(id);
+        //        return Ok(ApiResponse<IEnumerable<dynamic>>.Success(l));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+        //    }
+        //}
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.FTR.getFTRData)]
+        public async Task<IActionResult> getFTRData([FromQuery] GetFTRAllDataRequestModel m)
+        {
+            try
+            {
+                var l = await _customerService.getFtrAlldataDb(m);
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(l));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
 
 
 

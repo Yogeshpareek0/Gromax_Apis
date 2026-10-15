@@ -29,6 +29,7 @@ namespace GromaxMobileApis.Models.Services
             public string Village { get; set; }
             public string PostOffice { get; set; }
             public string District { get; set; }
+            public int TotalCount { get; set; }
         }
 
         public class AddFieldTechRequestModel
@@ -91,6 +92,59 @@ namespace GromaxMobileApis.Models.Services
 
             [MaxLength(50)]
             public string PositionName { get; set; }
+        }
+
+        public class UpdateFTRRequestModel
+        {
+            [Required]
+            public string Id { get; set; }
+
+            [Required]
+            [MaxLength(50)]
+            public string SSEName { get; set; }
+
+            public DateTime? FailureDate { get; set; }
+
+            public decimal? HoursWorked { get; set; }
+
+            public DateTime? RepairDate { get; set; }
+
+            [MaxLength(100)]
+            public string NatureOfWorkDone { get; set; }
+
+            [MaxLength(100)]
+            public string ImplementTrolleySize { get; set; }
+
+            [MaxLength(500)]
+            public string CustomerComplaints { get; set; }
+
+            [MaxLength(500)]
+            public string ProblemDefinition { get; set; }
+
+            [MaxLength(100)]
+            public string ModifiedBy { get; set; }
+
+            [MaxLength(50)]
+            public string PositionName { get; set; }
+
+            [Required]
+            [MaxLength(10)]
+            public string StockStatus { get; set; }
+        }
+
+        public class GetFTRAllDataRequestModel
+        {
+            public int pageNo { get; set; } = 1;
+            [Required]
+            public DateTime stDate { get; set; }
+            [Required]
+            public DateTime enDate { get; set; }
+            public string chassisNo { get; set; } = null;
+            public string stockStatus { get; set; } = "IN";
+
+            public int? stateId { get; set; } = null;
+            public bool isDownload { get; set; } = false;
+            public string duration { get; set; } = "This Month";
         }
     }
 }

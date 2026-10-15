@@ -487,6 +487,10 @@ namespace GromaxMobileApis.Utilities
         {
             public const string GetChassisDetailsForFTR = Base + "GetChassisDetailsForFTR";
             public const string addFTR = Base + "addFTR";
+            public const string updateFTR = Base + "updateFTR";
+            public const string getFTRById = Base + "getFTRById";
+            public const string getFTRData = Base + "getFTRData";
+            public const string getFTRDataReport = Base + "getFTRDataReport";
 
         }
 

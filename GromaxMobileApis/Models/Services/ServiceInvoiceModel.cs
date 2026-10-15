@@ -191,13 +191,15 @@ namespace GromaxMobileApis.Models.Services
         public string GroupItem { get; set; }
         public string GroupName { get; set; }
         public string Units { get; set; }
-        public string CatA { get; set; }
-        public string CatB { get; set; }
         public int? MaxScore { get; set; }
         public bool? PhotoRequired { get; set; }
         public int? MinPhoto { get; set; }
         public int? MaxPhoto { get; set; }
         public string AllowedScores { get; set; }
+        public string CatType { get; set; }
+        public bool IsInput { get; set; }
+        public string Cat { get; set; }
+        public int? FilledValue { get; set; }
     }
 
 
@@ -214,6 +216,9 @@ namespace GromaxMobileApis.Models.Services
 
         [Required(ErrorMessage = "Points Images is required")]
         public List<ReimbursementPointImage> PointImages { get; set; }
+
+        [Required(ErrorMessage = "Categoty Type is required")]
+        public string CateType { get; set; }
     }
 
     public class ReimbursementPoint

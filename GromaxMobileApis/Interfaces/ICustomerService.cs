@@ -2,6 +2,7 @@
 using GromaxMobileApis.Models.DealerMaster;
 using GromaxMobileApis.Models.Services;
 using GromaxMobileApis.Models.VerifyWebhook;
+using SkiaSharp;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -70,7 +71,7 @@ namespace GromaxMobileApis.Interfaces
 
         Task<int> UpdateReimbursementPaymentStatusDb(UpdateReimbursementStatusRequest m);
 
-        Task<IEnumerable<ReimbursementScoreMasterModel>> getReimbursementListdb();
+        Task<IEnumerable<ReimbursementScoreMasterModel>> getReimbursementListdb(string dealerCode);
 
         Task<int> InsertMechanicDb(MechanicCreateRequest m);
         Task<IEnumerable<MechanicMaster>> getMechanicListdb(MechanicApprovalFilterRequest m);
@@ -98,8 +99,13 @@ namespace GromaxMobileApis.Interfaces
 
         public Task<int> updateInstallationApprovaldb(InstallationApprovalRequest m);
 
-        Task<IEnumerable<GetChassisForFTRResponseModel>> GetChassisDetailsForFTRdb(string m);
+        Task<IEnumerable<GetChassisForFTRResponseModel>> GetChassisDetailsForFTRdb(GetFTRAllDataRequestModel m);
         Task<int> addFTRdb(AddFieldTechRequestModel m);
+        Task<int> updateFTRdb(UpdateFTRRequestModel m);
+
+        Task<IEnumerable<dynamic>> getFtrById(Guid id);
+        Task<IEnumerable<dynamic>> getFtrAlldataDb(GetFTRAllDataRequestModel m);
+
 
 
 

@@ -797,12 +797,14 @@ namespace GromaxMobileApis.Services
         }
 
 
-        public async Task<IEnumerable<ReimbursementScoreMasterModel>> getReimbursementListdb()
+        public async Task<IEnumerable<ReimbursementScoreMasterModel>> getReimbursementListdb(string dealerCode)
         {
             try
             {
+                var param = new { dealerCode };
                 var res = await _db.QueryAsync<ReimbursementScoreMasterModel>(
                   "usp_ReimbursementScoreMaster_GetList",
+                  param: param,
                   commandType: CommandType.StoredProcedure);
                 return res;
 
@@ -938,7 +940,8 @@ namespace GromaxMobileApis.Services
                     m.Date,
                     m.DealerCode,
                     CreatedBy = _user.GetUserName(),
-                    LoginAs = _user.GetPositionName()
+                    LoginAs = _user.GetPositionName(),
+                    m.CateType
                 };
                 var res = await _db.ExecuteScalarAsync<int>(
                     "usp_InsertReimbursementScore",
@@ -1109,11 +1112,20 @@ namespace GromaxMobileApis.Services
             }
         }
 
-        public async Task<IEnumerable<GetChassisForFTRResponseModel>> GetChassisDetailsForFTRdb(string m)
+        public async Task<IEnumerable<GetChassisForFTRResponseModel>> GetChassisDetailsForFTRdb(GetFTRAllDataRequestModel m)
         {
             try
             {
-                var Param = new { username = _user.GetUserName(), positionName = _user.GetPositionName(), stockStatus = m };
+                var Param = new
+                {
+                    username = _user.GetUserName(),
+                    positionName = _user.GetPositionName(),
+                    stockStatus = m.stockStatus,
+                    pageNo = m.pageNo,
+                    m.stDate,
+                    m.enDate,
+                    m.chassisNo
+                };
                 var res = await _db.QueryAsync<GetChassisForFTRResponseModel>(
                   "usp_GetChassisDetailsForFTR",
                   param: Param,
@@ -1138,6 +1150,71 @@ namespace GromaxMobileApis.Services
                     commandType: CommandType.StoredProcedure);
 
                 return res;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> updateFTRdb(UpdateFTRRequestModel m)
+        {
+            try
+            {
+                m.ModifiedBy = _user.GetUserName();
+                var res = await _db.ExecuteScalarAsync<int>(
+                    "usp_UpdateFieldTech",
+                    m,
+                    commandType: CommandType.StoredProcedure);
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<dynamic>> getFtrById(Guid id)
+        {
+            try
+            {
+                var Param = new { username = _user.GetUserName(), positionName = _user.GetPositionName(), ftrMasterId = id };
+                var res = await _db.QueryAsync(
+                  "usp_getFieldTechDataById",
+                  param: Param,
+                  commandType: CommandType.StoredProcedure);
+                return res;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<dynamic>> getFtrAlldataDb(GetFTRAllDataRequestModel m)
+        {
+            try
+            {
+                var Param = new
+                {
+                    username = _user.GetUserName(),
+                    positionName = _user.GetPositionName(),
+                    m.pageNo,
+                    m.stDate,
+                    m.enDate,
+                    m.chassisNo,
+                    m.stateId,
+                    m.isDownload,
+                    m.duration
+                };
+                var res = await _db.QueryAsync(
+                  "usp_getFieldTechAllData",
+                  param: Param,
+                  commandType: CommandType.StoredProcedure);
+                return res;
+
             }
             catch (Exception ex)
             {
