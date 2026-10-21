@@ -10,6 +10,7 @@ using System.Data;
 using System.Dynamic;
 using System.Threading.Tasks;
 using static GromaxMobileApis.Models.Services.FieldTechnicalReportModel;
+using static GromaxMobileApis.Models.Services.SparePartsModel;
 
 namespace GromaxMobileApis.Interfaces
 {
@@ -72,6 +73,7 @@ namespace GromaxMobileApis.Interfaces
         Task<int> UpdateReimbursementPaymentStatusDb(UpdateReimbursementStatusRequest m);
 
         Task<IEnumerable<ReimbursementScoreMasterModel>> getReimbursementListdb(string dealerCode);
+        Task<IEnumerable<dynamic>> getReimbursementAppListdb();
 
         Task<int> InsertMechanicDb(MechanicCreateRequest m);
         Task<IEnumerable<MechanicMaster>> getMechanicListdb(MechanicApprovalFilterRequest m);
@@ -105,6 +107,23 @@ namespace GromaxMobileApis.Interfaces
 
         Task<IEnumerable<dynamic>> getFtrById(Guid id);
         Task<IEnumerable<dynamic>> getFtrAlldataDb(GetFTRAllDataRequestModel m);
+
+        Task<IEnumerable<dynamic>> getMechanicCountOnDealerDb(string dealerCode);
+        Task<IEnumerable<dynamic>> getItemScoreReportDb(string dealerCode, int halfYearType, int year);
+
+        Task<SparePartsOrderResponse> SaveSparePartsOrder(SparePartsOrderRequest model);
+        Task<UpdateSparePartsPaymentResponse> UpdateSparePartsOrderPayment(UpdateSparePartsPaymentRequest model);
+        Task<List<SparePartsOrderDropdownResponse>> GetSparePartsOrderDropdown();
+        Task<SparePartsPaginationResponse> getSparePartsPaginationdb(int pageNumber,int pageSize,string partCodeOrName,string category);
+
+
+        Task<SparePartsOrderListResponse> GetSparePartsOrdersdb( int pageNumber,int pageSize);
+
+        Task<List<GetSparePartsOrderDetailResponse>> GetSparePartsOrderDetailsdb( string orderId);
+
+        Task<UpdateSparePartsOrderItemResponse> UpdateSparePartsOrderItem(UpdateSparePartsOrderItemRequest model);
+        Task<CreateSpareOrderInvoiceResponse> CreateSpareOrderInvoice(CreateSpareOrderInvoiceRequest model);
+
 
 
 

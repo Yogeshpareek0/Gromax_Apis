@@ -89,6 +89,35 @@ namespace GromaxMobileApis.Utilities
                 throw new Exception("File name is required.");
         }
 
+        public void PdfValidation(IFormFile file, string FileName)
+        {
+            if (file == null || file.Length == 0)
+                throw new Exception("Please select a PDF file.");
+
+            const long maxFileSize = 10 * 1024 * 1024;
+
+            if (file.Length > maxFileSize)
+                throw new Exception("PDF size cannot exceed 10 MB.");
+
+            var allowedExtensions = new[] { ".pdf" };
+
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+                throw new Exception("Only PDF files are allowed.");
+
+            var allowedContentTypes = new[]
+            {
+        "application/pdf"
+            };
+
+            if (!allowedContentTypes.Contains(file.ContentType.ToLowerInvariant()))
+                throw new Exception("Invalid PDF content type.");
+
+            if (string.IsNullOrWhiteSpace(FileName))
+                throw new Exception("File name is required.");
+        }
+
 
 
     }

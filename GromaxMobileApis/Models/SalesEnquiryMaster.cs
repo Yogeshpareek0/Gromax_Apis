@@ -356,6 +356,9 @@ namespace GromaxMobileApis.Models
         public string SalesEnquiryId { get; set; }
 
         public string FinanceMasterId { get; set; }
+
+       
+        public string remarks { get; set; } = null;
         public DateTime expectedRetailDate { get; set; }
     }
 

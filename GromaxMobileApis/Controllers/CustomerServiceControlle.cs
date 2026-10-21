@@ -29,6 +29,7 @@ using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using static GromaxMobileApis.Models.Services.FieldTechnicalReportModel;
+using static GromaxMobileApis.Models.Services.SparePartsModel;
 
 namespace GromaxMobileApis.Controllers
 {
@@ -1451,6 +1452,450 @@ namespace GromaxMobileApis.Controllers
 
 
 
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.reimbursement.getReimbursementMasterListApps)]
+        public async Task<IActionResult> getReimbursementMasterListApps()
+        {
+            try
+            {
+                var l = await _customerService.getReimbursementAppListdb();
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(l));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.mechanicServices.getMechanicCountOnnDealer)]
+        public async Task<IActionResult> getMechanicCountOnnDealer([FromQuery][Required] string dealerCode)
+        {
+            try
+            {
+                var l = await _customerService.getMechanicCountOnDealerDb(dealerCode);
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(l));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.reimbursement.getItemScoreReport)]
+        public async Task<IActionResult> getItemScoreReport([FromQuery] string dealerCode, [Required] int halfYearType, [Required] int year)
+        {
+            try
+            {
+                var l = await _customerService.getItemScoreReportDb(dealerCode, halfYearType, year);
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(l));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+        /// <summary>
+        /// Spare parts
+        /// </summary>
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.spareParts.saveSparePartsOrder)]
+        //[Authorize(Roles = "Dealer")]
+        public async Task<IActionResult> SaveSparePartsOrder([FromBody] SparePartsOrderRequest m)
+        {
+            try
+            {
+                SparePartsOrderResponse result = new SparePartsOrderResponse();
+
+                try
+                {
+                    result = await _customerService.SaveSparePartsOrder(m);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex?.Number == 500001)
+                    {
+                        return StatusCode(
+                            500,
+                            ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message)
+                        );
+                    }
+                }
+
+                if (result != null && result.StatusCode > 0)
+                    return Ok(ApiResponse<string>.Created());
+
+                return NotFound(
+                    ApiResponse<string>.NotFound("Record not found.")
+                );
+            }
+            catch
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<string>.Fail("Something Wrong")
+                );
+            }
+        }
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.spareParts.updateSparePartsOrderPayment)]
+        //[Authorize(Roles = "Dealer")]
+        public async Task<IActionResult> UpdateSparePartsOrderPayment([FromBody] UpdateSparePartsPaymentRequest m)
+        {
+            try
+            {
+                if (m == null)
+                {
+                    return BadRequest(
+                        ApiResponse<string>.BadRequest(
+                            "Request data is required."
+                        )
+                    );
+                }
+
+                if (string.IsNullOrWhiteSpace(m.OrderId))
+                {
+                    return BadRequest(
+                        ApiResponse<string>.BadRequest(
+                            "OrderId is required."
+                        )
+                    );
+                }
+
+                if (!Guid.TryParse(m.OrderId, out _))
+                {
+                    return BadRequest(
+                        ApiResponse<string>.BadRequest(
+                            "Invalid OrderId."
+                        )
+                    );
+                }
+
+                UpdateSparePartsPaymentResponse result = null;
+
+                try
+                {
+                    result = await _customerService.UpdateSparePartsOrderPayment(m);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex?.Number == 500001)
+                    {
+                        return StatusCode(
+                            500,
+                            ApiResponse<string>.SqlExceptionWithErrorCode(
+                                ex.Message
+                            )
+                        );
+                    }
+
+                    return StatusCode(
+                        500,
+                        ApiResponse<string>.Fail(
+                            "Database error occurred."
+                        )
+                    );
+                }
+
+                if (result == null)
+                {
+                    return StatusCode(
+                        500,
+                        ApiResponse<string>.Fail(
+                            "No response received from database."
+                        )
+                    );
+                }
+
+                if (result.StatusCode > 0)
+                {
+                    return Ok(ApiResponse<UpdateSparePartsPaymentResponse>.Success(result));
+                }
+
+                return BadRequest(ApiResponse<UpdateSparePartsPaymentResponse>.Fail(result.Message));
+            }
+            catch
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<string>.Fail(
+                        "Something Wrong"
+                    )
+                );
+            }
+        }
+
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.spareParts.getSparePartsOrderDropdown)]
+        //[Authorize(Roles = "Dealer")]
+        public async Task<IActionResult> GetSparePartsOrderDropdown()
+        {
+            try
+            {
+                var result = await _customerService.GetSparePartsOrderDropdown();
+
+                if (result != null && result.Any())
+                {
+                    return Ok(
+                        ApiResponse<List<SparePartsOrderDropdownResponse>>.Success(result)
+                    );
+                }
+
+                return NotFound(
+                    ApiResponse<string>.NotFound("Record not found.")
+                );
+            }
+            catch (SqlException ex)
+            {
+                if (ex?.Number == 500001)
+                {
+                    return StatusCode(
+                        500,
+                        ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message)
+                    );
+                }
+
+                return StatusCode(
+                    500,
+                    ApiResponse<string>.Fail("Database error occurred.")
+                );
+            }
+            catch
+            {
+                return StatusCode(
+                    500,
+                    ApiResponse<string>.Fail("Something Wrong")
+                );
+            }
+        }
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.spareParts.getSparePartsPagination)]
+        public async Task<IActionResult> getSparePartsPagination(int pageNumber = 1, int pageSize = 20, string partCodeOrName = null, string category = null)
+        {
+            try
+            {
+                var result = await _customerService.getSparePartsPaginationdb(
+                    pageNumber,
+                    pageSize,
+                    partCodeOrName,
+                    category);
+
+                return Ok(
+                    ApiResponse<SparePartsPaginationResponse>.Success(result)
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+        }
+
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.spareParts.getSparePartsOrders)]
+        //[Authorize(Roles = "Dealer")]
+        public async Task<IActionResult> GetSparePartsOrders([FromQuery] int pageNumber = 1, int pageSize = 20)
+        {
+            try
+            {
+                if (pageNumber <= 0)
+                    return BadRequest(
+                        ApiResponse<string>.Fail("PageNumber must be greater than zero.")
+                    );
+
+                if (pageSize <= 0)
+                    return BadRequest(
+                        ApiResponse<string>.Fail("PageSize must be greater than zero.")
+                    );
+
+                var result = await _customerService
+                    .GetSparePartsOrdersdb(pageNumber, pageSize);
+
+                if (result == null)
+                {
+                    return NotFound(
+                        ApiResponse<string>.NotFound("Record not found.")
+                    );
+                }
+
+                return Ok(
+                    ApiResponse<SparePartsOrderListResponse>.Success(result)
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+        }
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.spareParts.getSparePartsOrderDetails)]
+        //[Authorize(Roles = "Dealer")]
+        public async Task<IActionResult> GetSparePartsOrderDetails([FromQuery][Required] string orderId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(orderId))
+                {
+                    return BadRequest(
+                        ApiResponse<string>.Fail("OrderId is required.")
+                    );
+                }
+
+                if (!Guid.TryParse(orderId, out _))
+                {
+                    return BadRequest(
+                        ApiResponse<string>.Fail("OrderId must be a valid GUID.")
+                    );
+                }
+
+                var result = await _customerService
+                    .GetSparePartsOrderDetailsdb(orderId);
+
+                if (result == null || !result.Any())
+                {
+                    return NotFound(
+                        ApiResponse<string>.NotFound("Order details not found.")
+                    );
+                }
+
+                return Ok(
+                    ApiResponse<List<GetSparePartsOrderDetailResponse>>.Success(result)
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+        }
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.spareParts.updateSparePartsOrderItem)]
+        //[Authorize(Roles = "Dealer")]
+        public async Task<IActionResult> UpdateSparePartsOrderItem([FromBody] UpdateSparePartsOrderItemRequest m)
+        {
+            try
+            {
+                UpdateSparePartsOrderItemResponse result;
+
+                try
+                {
+                    result = await _customerService.UpdateSparePartsOrderItem(m);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex?.Number == 500001)
+                    {
+                        return StatusCode(
+                            500,
+                            ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message)
+                        );
+                    }
+
+                    throw;
+                }
+
+                if (result != null && result.StatusCode > 0)
+                {
+                    return Ok(
+                        ApiResponse<UpdateSparePartsOrderItemResponse>.Success(result)
+                    );
+                }
+
+                return BadRequest(
+                    ApiResponse<string>.BadRequest("Unable to update order item.")
+                );
+            }
+            catch (FormatException)
+            {
+                return BadRequest(
+                    ApiResponse<string>.BadRequest(
+                        "Invalid OrderDetailId. OrderDetailId must be a valid GUID."
+                    )
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+        }
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.spareParts.createSpareOrderInvoice)]
+        public async Task<IActionResult> CreateSpareOrderInvoice([FromForm] CreateSpareOrderInvoiceRequest m)
+        {
+            try
+            {
+                _getFileName.PdfValidation(
+                    m.PDF,
+                    "spare_Inv" + m.OrderId
+                );
+
+                m.PDFUrl = await _getFileName._getFileNamev1(
+                    m.PDF,
+                    "spare_Inv_" + m.OrderId
+                );
+
+                var result = await _customerService.CreateSpareOrderInvoice(m);
+
+                if (result != null && result.StatusCode > 0)
+                {
+                    return Ok(
+                        ApiResponse<CreateSpareOrderInvoiceResponse>.Success(result)
+                    );
+                }
+
+                return BadRequest(
+                    ApiResponse<string>.BadRequest(
+                        result?.Message ?? "Invoice could not be created."
+                    )
+                );
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 500001)
+                {
+                    return StatusCode(
+                        500,
+                        ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message)
+                    );
+                }
+
+                return StatusCode(
+                    500,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+        }
+
         //[AllowAnonymous]
         //[HttpGet]
         //[Route(GromaxMobileApis.Utilities.customerServices.invoice.service)]
@@ -1586,10 +2031,6 @@ namespace GromaxMobileApis.Controllers
         //            ApiResponse<string>.Fail("Failed"));
         //    }
         //}
-
-
-
-
 
     }
 }

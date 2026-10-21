@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using static GromaxMobileApis.Models.Services.FieldTechnicalReportModel;
+using static GromaxMobileApis.Models.Services.SparePartsModel;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace GromaxMobileApis.Services
@@ -1219,6 +1220,300 @@ namespace GromaxMobileApis.Services
             catch (Exception ex)
             {
                 throw;
+            }
+        }
+
+        public async Task<IEnumerable<dynamic>> getReimbursementAppListdb()
+        {
+            try
+            {
+                var res = await _db.QueryAsync<dynamic>(
+                  "usp_ReimbursementScoreMasterApp_GetList",
+                  commandType: CommandType.StoredProcedure);
+                return res;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
+        public async Task<IEnumerable<dynamic>> getMechanicCountOnDealerDb(string dealerCode)
+        {
+            try
+            {
+                var param = new { dealerCode, username = _user.GetUserName(), positionName = _user.GetPositionName() };
+                var res = await _db.QueryAsync<dynamic>(
+                  "USP_getMechanicCountOnDealer",
+                  param,
+                  commandType: CommandType.StoredProcedure);
+                return res;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
+
+        public async Task<IEnumerable<dynamic>> getItemScoreReportDb(string dealerCode, int halfYearType, int year)
+        {
+            try
+            {
+                var param = new { dealerCode, username = _user.GetUserName(), positionName = _user.GetPositionName(), halfYearType, year };
+                var res = await _db.QueryAsync<dynamic>(
+                  "USP_itemScoreReport",
+                  param,
+                  commandType: CommandType.StoredProcedure);
+                return res;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<SparePartsOrderResponse> SaveSparePartsOrder(SparePartsOrderRequest model)
+        {
+            try
+            {
+                var dt = new DataTable();
+
+                dt.Columns.Add("SparePartId", typeof(int));
+                dt.Columns.Add("Quantity", typeof(decimal));
+
+                foreach (var item in model.SparePartsOrderDetails)
+                {
+                    dt.Rows.Add(
+                        item.SparePartId,
+                        item.Quantity
+                    );
+                }
+
+                var param = new DynamicParameters();
+
+                param.Add("DealerId", _user.GetDealerCode());
+                param.Add("CreatedBy", _user.GetUserName());
+                param.Add("PaymentStatus", model.PaymentStatus);
+                param.Add("Remarks", model.Remarks);
+                param.Add("PaymentAmount", model.PaymentAmount);
+                param.Add("PaymentMode", model.PaymentMode);
+                param.Add("TransactionId", model.TransactionId);
+                param.Add("ReferenceNo", model.ReferenceNo);
+                param.Add("PaymentRemarks", model.PaymentRemarks);
+
+                param.Add(
+                    "SparePartsOrderDetails",
+                    dt.AsTableValuedParameter("dbo.SparePartsOrderDetailsType")
+                );
+
+                var res = await _db.QueryFirstOrDefaultAsync<SparePartsOrderResponse>(
+                "usp_SaveSparePartsOrder",
+                param,
+                commandType: CommandType.StoredProcedure
+                );
+
+                return res;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<UpdateSparePartsPaymentResponse> UpdateSparePartsOrderPayment(UpdateSparePartsPaymentRequest model)
+        {
+            try
+            {
+                var param = new
+                {
+                    OrderId = Guid.Parse(model.OrderId),
+                    model.PaymentStatus,
+                    model.PaymentAmount,
+                    model.PaymentMode,
+                    model.TransactionId,
+                    model.ReferenceNo,
+                    model.PaymentRemarks,
+                    UpdatedBy = _user.GetUserName()
+                };
+
+                var res = await _db.QueryFirstOrDefaultAsync<UpdateSparePartsPaymentResponse>(
+                    "usp_UpdateSparePartsOrderPaymentStatus",
+                    param,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<SparePartsOrderDropdownResponse>> GetSparePartsOrderDropdown()
+        {
+            try
+            {
+                var res = await _db.QueryAsync<SparePartsOrderDropdownResponse>(
+                    "usp_dropDownValueForSparePartsOrder",
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return res.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+        public async Task<SparePartsPaginationResponse> getSparePartsPaginationdb(int pageNumber, int pageSize, string partCodeOrName, string category)
+        {
+            try
+            {
+                var param = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    PartCodeOrName = partCodeOrName,
+                    Category = category
+                };
+
+                using var multi = await _db.QueryMultipleAsync(
+                    "usp_getSparePartsPagination",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                var data = (await multi.ReadAsync<SparesPartMaster>()).ToList();
+
+                var totalRecords = await multi.ReadFirstAsync<int>();
+
+                return new SparePartsPaginationResponse
+                {
+                    Data = data,
+                    TotalRecords = totalRecords,
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
+        public async Task<SparePartsOrderListResponse> GetSparePartsOrdersdb(int pageNumber, int pageSize)
+        {
+            try
+            {
+                var param = new
+                {
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    Username = _user.GetUserName(),
+                    PositionName = _user.GetPositionName()
+                };
+
+                using var multi = await _db.QueryMultipleAsync(
+                    "usp_GetSparePartsOrders",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                var data = (await multi.ReadAsync<GetSparePartsOrderResponse>()).ToList();
+
+                var totalRecords = await multi.ReadFirstAsync<int>();
+
+                return new SparePartsOrderListResponse
+                {
+                    Data = data,
+                    TotalRecords = totalRecords
+                };
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<GetSparePartsOrderDetailResponse>> GetSparePartsOrderDetailsdb(
+    string orderId)
+        {
+            try
+            {
+                var param = new
+                {
+                    OrderId = Guid.Parse(orderId)
+                };
+
+                var data = await _db.QueryAsync<GetSparePartsOrderDetailResponse>(
+                    "usp_GetSparePartsOrderDetails",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return data.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<UpdateSparePartsOrderItemResponse> UpdateSparePartsOrderItem(UpdateSparePartsOrderItemRequest model)
+        {
+            try
+            {
+                var param = new
+                {
+                    OrderDetailId = string.IsNullOrWhiteSpace(model.OrderDetailId) ? (Guid?)null : Guid.Parse(model.OrderDetailId),
+                    model.Action,
+                    model.Quantity,
+                    OrderId = string.IsNullOrWhiteSpace(model.OrderId) ? (Guid?)null : Guid.Parse(model.OrderId),
+                    CreatedBy = _user.GetUserName()
+                };
+
+                var res = await _db.QueryFirstOrDefaultAsync<UpdateSparePartsOrderItemResponse>(
+                    "usp_UpdateSparePartsOrderItem",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<CreateSpareOrderInvoiceResponse> CreateSpareOrderInvoice(CreateSpareOrderInvoiceRequest model)
+        {
+            try
+            {
+                var param = new
+                {
+                    OrderId = Guid.Parse(model.OrderId),
+                    model.InvoiceNumber,
+                    model.InvoiceDate,
+                    model.DocketNumber,
+                    model.TaxableAmount,
+                    model.TaxAmount,
+                    model.TotalAmount,
+                    model.PDFUrl,
+                    CreatedBy = _user.GetUserName()
+                };
+
+                var res = await _db.QueryFirstOrDefaultAsync<CreateSpareOrderInvoiceResponse>(
+                    "usp_CreateSpareOrderInvoice",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
             }
         }
     }

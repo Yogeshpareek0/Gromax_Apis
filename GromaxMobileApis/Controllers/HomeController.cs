@@ -1697,6 +1697,7 @@ namespace GromaxMobileApis.Controllers
         {
             try
             {
+
                 string LoginPosition = User.FindFirst("LoginPosition")?.Value;
                 string PlatformType = User.FindFirst("PlatformType")?.Value;
                 string username = User.FindFirst(ClaimTypes.Name)?.Value;

@@ -288,6 +288,18 @@ namespace GromaxMobileApis.Services
                     result = await _db.QueryAsync("USP_InsertUpdatePDD", param: parameter, commandType: CommandType.StoredProcedure);
 
                 }
+                else if (UploadId == 13)
+                {
+                    var parameter = new
+                    {
+                        StagingTableName = StagingTable,
+                        CreatedUser = createuser
+                        //loginas = loginposition,
+                        //Name_user = loginName
+                    };
+                    result = await _db.QueryAsync("USP_InsertSpareStock", param: parameter, commandType: CommandType.StoredProcedure);
+
+                }
                 return result;
 
 

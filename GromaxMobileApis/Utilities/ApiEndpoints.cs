@@ -433,6 +433,15 @@ namespace GromaxMobileApis.Utilities
         public static class spareParts
         {
             public const string getSpareParts = Base + "getSpareParts";
+            public const string saveSparePartsOrder = Base + "saveSparePartsOrder";
+            public const string updateSparePartsOrderPayment = Base + "updateSparePartsOrderPayment";
+            public const string getSparePartsOrderDropdown = Base + "getSparePartsOrderDropdown";
+            public const string getSparePartsPagination = Base + "getSparePartsPagination";
+            public const string getSparePartsOrders = Base + "getSparePartsOrders";
+            public const string getSparePartsOrderDetails = Base + "getSparePartsOrderDetails";
+            public const string updateSparePartsOrderItem = Base + "updateSparePartsOrderItem";
+            public const string createSpareOrderInvoice = Base + "createSpareOrderInvoice";
+
         }
 
         public static class jobCard
@@ -464,6 +473,9 @@ namespace GromaxMobileApis.Utilities
         {
             public const string getReimbursementList = Base + "getReimbursementList";
             public const string insertReimbursementScore = Base + "insertReimbursementScore";
+            public const string getReimbursementMasterListApps = Base + "getReimbursementMasterListApps";
+            public const string getItemScoreReport = Base + "getItem-ScoreReport";
+
 
         }
 
@@ -480,6 +492,7 @@ namespace GromaxMobileApis.Utilities
             public const string approvalstatus = Base + "approval-status";
             public const string getMechanicsPendingList = Base + "getMechanicsPendingList";
             public const string getMechanicDropdownList = Base + "getMechanicDropdownList";
+            public const string getMechanicCountOnnDealer = Base + "getMechanicCountOnnDealer";
 
 
         }

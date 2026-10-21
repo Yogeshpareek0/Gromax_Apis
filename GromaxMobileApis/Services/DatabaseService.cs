@@ -1676,7 +1676,8 @@ namespace GromaxMobileApis.Services
 
                     SalesEnquiryId = Guid.Parse(model.SalesEnquiryId),
                     FinanceMasterId = Guid.Parse(model.FinanceMasterId),
-                    expectedRetailDate = model.expectedRetailDate
+                    expectedRetailDate = model.expectedRetailDate,
+                    remarks = model.remarks
                 };
                 var values = await _db.ExecuteAsync("usp_ConvertToRetailSales",
                     param: parameter, commandType: CommandType.StoredProcedure);
