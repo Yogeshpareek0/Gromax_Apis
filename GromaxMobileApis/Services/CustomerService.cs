@@ -1339,7 +1339,8 @@ namespace GromaxMobileApis.Services
                     model.TransactionId,
                     model.ReferenceNo,
                     model.PaymentRemarks,
-                    UpdatedBy = _user.GetUserName()
+                    UpdatedBy = _user.GetUserName(),
+                    PositionName = _user.GetPositionName()
                 };
 
                 var res = await _db.QueryFirstOrDefaultAsync<UpdateSparePartsPaymentResponse>(
@@ -1445,7 +1446,9 @@ namespace GromaxMobileApis.Services
             {
                 var param = new
                 {
-                    OrderId = Guid.Parse(orderId)
+                    OrderId = Guid.Parse(orderId),
+                    Username = _user.GetUserName(),
+                    PositionName = _user.GetPositionName()
                 };
 
                 var data = await _db.QueryAsync<GetSparePartsOrderDetailResponse>(
@@ -1471,7 +1474,8 @@ namespace GromaxMobileApis.Services
                     model.Action,
                     model.Quantity,
                     OrderId = string.IsNullOrWhiteSpace(model.OrderId) ? (Guid?)null : Guid.Parse(model.OrderId),
-                    CreatedBy = _user.GetUserName()
+                    CreatedBy = _user.GetUserName(),
+                    PositionName = _user.GetPositionName()
                 };
 
                 var res = await _db.QueryFirstOrDefaultAsync<UpdateSparePartsOrderItemResponse>(
@@ -1501,7 +1505,8 @@ namespace GromaxMobileApis.Services
                     model.TaxAmount,
                     model.TotalAmount,
                     model.PDFUrl,
-                    CreatedBy = _user.GetUserName()
+                    CreatedBy = _user.GetUserName(),
+                    PositionName = _user.GetPositionName()
                 };
 
                 var res = await _db.QueryFirstOrDefaultAsync<CreateSpareOrderInvoiceResponse>(
@@ -1513,7 +1518,31 @@ namespace GromaxMobileApis.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Database Error: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<SpareOrderInvoiceResponse> GetSpareOrderInvoice(string orderId)
+        {
+            try
+            {
+                var param = new
+                {
+                    OrderId = Guid.Parse(orderId),
+                    CreatedBy = _user.GetUserName(),
+                    PositionName = _user.GetPositionName()
+                };
+
+                var res = await _db.QueryFirstOrDefaultAsync<SpareOrderInvoiceResponse>(
+                    "usp_GetSpareOrderInvoiceByOrderId",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
     }

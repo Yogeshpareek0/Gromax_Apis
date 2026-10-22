@@ -216,6 +216,8 @@ namespace GromaxMobileApis.Models.Services
             public string CreatedBy { get; set; }
             public DateTime CreatedDate { get; set; }
             public decimal TotalGSTAmount { get; set; }
+            public bool IsInvoicing { get; set; }
+            public bool IsDelivered { get; set; }
         }
 
         public class GetSparePartsOrderDetailResponse
@@ -320,6 +322,8 @@ namespace GromaxMobileApis.Models.Services
 
             public string PDFUrl { get; set; }
             public IFormFile PDF { get; set; }
+            public bool IsInvoicing { get; set; }
+            public bool IsDelivered { get; set; }
 
 
             public IEnumerable<ValidationResult> Validate(
@@ -452,5 +456,31 @@ namespace GromaxMobileApis.Models.Services
 
             public string InvoiceStatus { get; set; }
         }
+
+
+        public class SpareOrderInvoiceResponse
+        {
+            public Guid InvoiceId { get; set; }
+            public Guid OrderId { get; set; }
+
+            public string InvoiceNumber { get; set; }
+            public DateTime? InvoiceDate { get; set; }
+
+            public string DealerCode { get; set; }
+            public string DocketNumber { get; set; }
+
+            public decimal TaxableAmount { get; set; }
+            public decimal TaxAmount { get; set; }
+            public decimal TotalAmount { get; set; }
+
+            public string PDFUrl { get; set; }
+
+            public string CreatedBy { get; set; }
+            public DateTime? CreatedDate { get; set; }
+
+            public bool IsDelivered { get; set; }
+            public DateTime? DeliveryDate { get; set; }
+        }
+
     }
 }

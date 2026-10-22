@@ -1847,16 +1847,18 @@ namespace GromaxMobileApis.Controllers
         {
             try
             {
-                _getFileName.PdfValidation(
-                    m.PDF,
-                    "spare_Inv" + m.OrderId
-                );
+                if (!m.IsInvoicing)
+                {
+                    _getFileName.PdfValidation(
+                        m.PDF,
+                        "spare_Inv" + m.OrderId
+                    );
 
-                m.PDFUrl = await _getFileName._getFileNamev1(
-                    m.PDF,
-                    "spare_Inv_" + m.OrderId
-                );
-
+                    m.PDFUrl = await _getFileName._getFileNamev1(
+                        m.PDF,
+                        "spare_Inv_" + m.OrderId
+                    );
+                }
                 var result = await _customerService.CreateSpareOrderInvoice(m);
 
                 if (result != null && result.StatusCode > 0)
@@ -1871,6 +1873,47 @@ namespace GromaxMobileApis.Controllers
                         result?.Message ?? "Invoice could not be created."
                     )
                 );
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 500001)
+                {
+                    return StatusCode(
+                        500,
+                        ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message)
+                    );
+                }
+
+                return StatusCode(
+                    500,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+        }
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.spareParts.GetSpareOrderInvoice)]
+
+        public async Task<IActionResult> GetSpareOrderInvoice(string orderId)
+        {
+            try
+            {
+                var res = await _customerService.GetSpareOrderInvoice(orderId);
+
+                if (res == null)
+                {
+                    return NotFound(ApiResponse<String>.NotFound("Invoice not found for this order."));
+                }
+
+                return Ok(ApiResponse<SpareOrderInvoiceResponse>.Success(res));
+
             }
             catch (SqlException ex)
             {

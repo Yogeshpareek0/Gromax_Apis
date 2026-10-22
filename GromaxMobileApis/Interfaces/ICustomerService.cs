@@ -114,15 +114,17 @@ namespace GromaxMobileApis.Interfaces
         Task<SparePartsOrderResponse> SaveSparePartsOrder(SparePartsOrderRequest model);
         Task<UpdateSparePartsPaymentResponse> UpdateSparePartsOrderPayment(UpdateSparePartsPaymentRequest model);
         Task<List<SparePartsOrderDropdownResponse>> GetSparePartsOrderDropdown();
-        Task<SparePartsPaginationResponse> getSparePartsPaginationdb(int pageNumber,int pageSize,string partCodeOrName,string category);
+        Task<SparePartsPaginationResponse> getSparePartsPaginationdb(int pageNumber, int pageSize, string partCodeOrName, string category);
 
 
-        Task<SparePartsOrderListResponse> GetSparePartsOrdersdb( int pageNumber,int pageSize);
+        Task<SparePartsOrderListResponse> GetSparePartsOrdersdb(int pageNumber, int pageSize);
 
-        Task<List<GetSparePartsOrderDetailResponse>> GetSparePartsOrderDetailsdb( string orderId);
+        Task<List<GetSparePartsOrderDetailResponse>> GetSparePartsOrderDetailsdb(string orderId);
 
         Task<UpdateSparePartsOrderItemResponse> UpdateSparePartsOrderItem(UpdateSparePartsOrderItemRequest model);
         Task<CreateSpareOrderInvoiceResponse> CreateSpareOrderInvoice(CreateSpareOrderInvoiceRequest model);
+        Task<SpareOrderInvoiceResponse> GetSpareOrderInvoice(string orderId);
+
 
 
 

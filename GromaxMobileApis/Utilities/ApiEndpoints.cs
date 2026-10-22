@@ -441,6 +441,7 @@ namespace GromaxMobileApis.Utilities
             public const string getSparePartsOrderDetails = Base + "getSparePartsOrderDetails";
             public const string updateSparePartsOrderItem = Base + "updateSparePartsOrderItem";
             public const string createSpareOrderInvoice = Base + "createSpareOrderInvoice";
+            public const string GetSpareOrderInvoice = Base + "GetSpareOrderInvoice";
 
         }
 
