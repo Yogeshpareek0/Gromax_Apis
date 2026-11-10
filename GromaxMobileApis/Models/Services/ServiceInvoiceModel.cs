@@ -205,6 +205,7 @@ namespace GromaxMobileApis.Models.Services
 
     public class ReimbursementRequest
     {
+
         [Required(ErrorMessage = "DealerCode is required")]
         public string DealerCode { get; set; }
 
@@ -245,6 +246,56 @@ namespace GromaxMobileApis.Models.Services
 
         public DataTable PointImages { get; set; }
     }
+
+
+
+
+
+    public class UpdateReimbursementRequest
+    {
+
+        public string itemScoreId { get; set; } = null;
+
+        [Required(ErrorMessage = "Points Score is required")]
+        public List<UpdateReimbursementPoint> Points { get; set; }
+
+        [Required(ErrorMessage = "Points Images is required")]
+        public List<UpdateReimbursementPointImage> PointImages { get; set; }
+
+        [Required(ErrorMessage = "Categoty Type is required")]
+        public string CateType { get; set; }
+    }
+
+    public class UpdateReimbursementPoint
+    {
+        [Required(ErrorMessage = "Id is required")]
+        public Guid PointId { get; set; }
+
+        public decimal Score { get; set; }
+        public string status { get; set; }
+    }
+
+    public class UpdateReimbursementPointImage
+    {
+        [Required(ErrorMessage = "Id is required")]
+
+        public Guid PointId { get; set; }
+        public string Image { get; set; }
+    }
+
+    public class ApproveReimbursementRequest
+    {
+        [MaxLength(500, ErrorMessage = "Remark cannot exceed 500 characters.")]
+        public string Remark { get; set; }
+
+        [Required]
+        [RegularExpression("^(1|-1)$", ErrorMessage = "Status must be either 1 or -1.")]
+        public int Status { get; set; }
+
+        [Required(ErrorMessage = "ApprovalId is required.")]
+        public Guid ApprovalId { get; set; }
+    }
+
 
 }
 

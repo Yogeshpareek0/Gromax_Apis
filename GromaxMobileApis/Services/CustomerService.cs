@@ -7,6 +7,7 @@ using GromaxMobileApis.Models.Services;
 using GromaxMobileApis.Models.VerifyWebhook;
 using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
@@ -17,8 +18,10 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using YamlDotNet.Core;
 using static GromaxMobileApis.Models.Services.FieldTechnicalReportModel;
 using static GromaxMobileApis.Models.Services.SparePartsModel;
+using static GromaxMobileApis.Models.Services.WarrantyClaimModel;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace GromaxMobileApis.Services
@@ -837,12 +840,12 @@ namespace GromaxMobileApis.Services
             }
         }
 
-        public async Task<IEnumerable<MechanicMaster>> getMechanicListdb(MechanicApprovalFilterRequest m)
+        public async Task<IEnumerable<MechanicMasterDataModel>> getMechanicListdb(MechanicApprovalFilterRequest m)
         {
             try
             {
                 var Param = new { username = _user.GetUserName(), loginAs = _user.GetPositionName(), m.Status, m.StDate, m.EnDate };
-                var res = await _db.QueryAsync<MechanicMaster>(
+                var res = await _db.QueryAsync<MechanicMasterDataModel>(
                   "usp_getMechanicMasterList",
                   param: Param,
                   commandType: CommandType.StoredProcedure);
@@ -1406,7 +1409,16 @@ namespace GromaxMobileApis.Services
             }
         }
 
-        public async Task<SparePartsOrderListResponse> GetSparePartsOrdersdb(int pageNumber, int pageSize)
+        public async Task<SparePartsOrderListResponse> GetSparePartsOrdersdb(
+            int pageNumber,
+            int pageSize,
+            string DealerCode,
+            string StateName,
+            string Duration,
+            DateTime? StDate,
+            DateTime? EnDate,
+            string OrderNo,
+            int IsDownload)
         {
             try
             {
@@ -1415,7 +1427,14 @@ namespace GromaxMobileApis.Services
                     PageNumber = pageNumber,
                     PageSize = pageSize,
                     Username = _user.GetUserName(),
-                    PositionName = _user.GetPositionName()
+                    PositionName = _user.GetPositionName(),
+                    DealerCode = string.IsNullOrWhiteSpace(DealerCode) ? "All" : DealerCode,
+                    StateName = StateName,
+                    Duration = Duration,
+                    StDate = StDate,
+                    EnDate = EnDate,
+                    OrderNo = string.IsNullOrWhiteSpace(OrderNo) ? null : OrderNo.Trim(),
+                    IsDownload
                 };
 
                 using var multi = await _db.QueryMultipleAsync(
@@ -1425,12 +1444,19 @@ namespace GromaxMobileApis.Services
 
                 var data = (await multi.ReadAsync<GetSparePartsOrderResponse>()).ToList();
 
-                var totalRecords = await multi.ReadFirstAsync<int>();
+                var totalRecords = await multi.ReadFirstAsync();
 
                 return new SparePartsOrderListResponse
                 {
                     Data = data,
-                    TotalRecords = totalRecords
+                    TotalRecords = totalRecords.TotalRecords,
+                    TotalRecordsValue = totalRecords.TotalRecordsValue,
+                    TotalPendingInvoice = totalRecords.TotalPendingInvoice,
+                    TotalPendingInvoiceValue = totalRecords.TotalPendingInvoiceValue,
+                    TotalPendingPayment = totalRecords.TotalPendingPayment,
+                    TotalPendingPaymentValue = totalRecords.TotalPendingPaymentValue,
+                    TotalPendingDelivered = totalRecords.TotalPendingDelivered,
+                    TotalPendingDeliveredValue = totalRecords.TotalPendingDeliveredValue
                 };
             }
             catch (Exception ex)
@@ -1535,6 +1561,342 @@ namespace GromaxMobileApis.Services
 
                 var res = await _db.QueryFirstOrDefaultAsync<SpareOrderInvoiceResponse>(
                     "usp_GetSpareOrderInvoiceByOrderId",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<dynamic>> GetClosedJobCardListdb(ClosedJobCardListRequest request)
+        {
+            try
+            {
+                request.PositionName = _user.GetPositionName();
+                request.Username = _user.GetUserName();
+                var multi = await _db.QueryAsync(
+                    "usp_GetClosedJobCardList",
+                    request,
+                    commandType: CommandType.StoredProcedure);
+
+                return multi;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<dynamic>> getSparePartListByJobCardIddb(Guid Id)
+        {
+            try
+            {
+                var param = new { JobCardMasterId = Id };
+                var multi = await _db.QueryAsync(
+                    "USP_getSparePartByJobCardId",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return multi;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> SaveWarrantyClaimdb(WarrantyClaimRequest request)
+        {
+            try
+            {
+                var partsTable = new DataTable();
+                partsTable.Columns.Add("SparePartId", typeof(Guid));
+                partsTable.Columns.Add("PartCode", typeof(string));
+                partsTable.Columns.Add("ClaimQty", typeof(decimal));
+                partsTable.Columns.Add("Rate", typeof(decimal));
+                partsTable.Columns.Add("GSTPercentage", typeof(decimal));
+
+                foreach (var part in request.Parts)
+                {
+                    partsTable.Rows.Add(
+                        part.SparePartId,
+                        string.IsNullOrWhiteSpace(part.PartCode) ? part.PartCode : DBNull.Value,
+                        part.ClaimQty,
+                        part.Rate,
+                        part.GSTPercentage
+                    );
+                }
+
+                var param = new
+                {
+                    JobCardId = request.JobCardId,
+                    ClaimRemarks = request.ClaimRemarks,
+                    CreatedBy = _user.GetUserName(),
+                    PositionName = _user.GetPositionName(),
+                    Parts = partsTable.AsTableValuedParameter("dbo.WarrantyClaimPartsType"),
+                    LabourCharge = request.LabourCharge,
+                    DealerCode = _user.GetDealerCode()
+                };
+
+                var result = await _db.ExecuteScalarAsync<int>(
+                    "usp_SaveWarrantyClaim",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<dynamic>> getPendingWarrantyClaimListdb()
+        {
+            try
+            {
+                var multi = await _db.QueryAsync(
+                    "USP_GetPendingWarrantyClaimMasterList",
+                    commandType: CommandType.StoredProcedure);
+
+                return multi;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<dynamic>> getWarrantySparesByMasterIddb(Guid Id)
+        {
+            try
+            {
+                var param = new { Id };
+                var multi = await _db.QueryAsync(
+                    "USP_WarrantySparesListByMasterId",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return multi;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> UpdateWarrantyClaimApprovaldb(WarrantyClaimApprovalRequest request)
+        {
+            var parameters = new
+            {
+                WarrantyClaimId = request.WarrantyClaimId,
+                PositionName = request.PositionName,
+                Action = request.Action,
+                Remarks = request.Remarks,
+                ModifiedBy = _user.GetUserName()
+            };
+
+            var result = await _db.ExecuteScalarAsync<int>(
+                "dbo.usp_UpdateWarrantyClaimApproval",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return result;
+        }
+
+        public async Task<int> UpdateWarrantyClaimdb(UpdateWarrantyClaimRequest request)
+        {
+            try
+            {
+                var partsTable = new DataTable();
+                partsTable.Columns.Add("SparePartId", typeof(Guid));
+                partsTable.Columns.Add("PartCode", typeof(string));
+                partsTable.Columns.Add("ClaimQty", typeof(decimal));
+                partsTable.Columns.Add("Rate", typeof(decimal));
+                partsTable.Columns.Add("GSTPercentage", typeof(decimal));
+
+                foreach (var part in request.Parts)
+                {
+                    partsTable.Rows.Add(
+                        part.SparePartId,
+                        string.IsNullOrWhiteSpace(part.PartCode) ? part.PartCode : DBNull.Value,
+                        part.ClaimQty,
+                        part.Rate,
+                        part.GSTPercentage
+                    );
+                }
+
+                var param = new
+                {
+                    WarrantyClaimId = request.WarrantyClaimId,
+                    ClaimRemarks = request.ClaimRemarks,
+                    CreatedBy = _user.GetUserName(),
+                    PositionName = _user.GetPositionName(),
+                    Parts = partsTable.AsTableValuedParameter("dbo.WarrantyClaimPartsType"),
+                    LabourCharge = request.LabourCharge
+                };
+
+                var result = await _db.ExecuteScalarAsync<int>(
+                    "usp_UpdateWarrantyClaim",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<getReimbursementScoreListByIdModel> getReimbursementScoreListById(string Id)
+        {
+            try
+            {
+                var param = new
+                {
+                    id = Guid.Parse(Id)
+                };
+
+                using (var multi = await _db.QueryMultipleAsync("USP_getReimbursementScoreListById", param, commandType: CommandType.StoredProcedure))
+                {
+                    var report = (await multi.ReadAsync<ReimbursementScoreDetailModel>()).ToList();
+                    var images = (await multi.ReadAsync<ReimbursementScoreImageModel>()).ToList();
+
+                    // Same ReimbursementScoreDetailId wali sabhi images ek list me
+                    var imgLookup = images
+                        .Where(x => !string.IsNullOrWhiteSpace(x.ImagesUrl))
+                        .ToLookup(x => x.ReimbursementScoreDetailId);
+
+                    foreach (var r in report)
+                    {
+                        r.images = imgLookup[r.Id]
+                            .Select(x => x.ImagesUrl.Trim())
+                            .Distinct()
+                            .ToList();
+                    }
+
+                    return new getReimbursementScoreListByIdModel
+                    {
+                        report = report
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
+
+        public async Task<IEnumerable<dynamic>> getItemScoreApprovalPendingReportDb()
+        {
+            try
+            {
+                var param = new { username = _user.GetUserName(), positionName = _user.GetPositionName() };
+                var res = await _db.QueryAsync<dynamic>(
+                  "USP_itemScorePendingApprovalReportList",
+                  param,
+                  commandType: CommandType.StoredProcedure);
+                return res;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> UpdateReimbursementScoreDb(UpdateReimbursementRequest m, ReimbursementDataTables dt)
+        {
+            try
+            {
+                var param = new
+                {
+                    ApprovalId = m.itemScoreId,
+                    PointImages = dt.PointImages,
+                    Points = dt.Points,
+                    CreatedBy = _user.GetUserName(),
+                    LoginAs = _user.GetPositionName(),
+                };
+                var res = await _db.ExecuteScalarAsync<int>(
+                    "usp_UpdateReimbursementScore",
+                    param,
+                    commandType: CommandType.StoredProcedure);
+
+                return res;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Database Error: {ex.Message}");
+            }
+        }
+
+        public async Task<int> ApproveReimbursementScoreDb(ApproveReimbursementRequest m)
+        {
+            var parameters = new
+            {
+                username = _user.GetUserName(),
+                position = _user.GetPositionName(),
+                remark = m.Remark,
+                Status = m.Status,
+                ApprovalId = m.ApprovalId
+            };
+
+            var result = await _db.ExecuteScalarAsync<int>(
+                "dbo.usp_approveItemScore",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return result;
+        }
+
+        public async Task<ItemScoreEmailDataModel> getItemScoreEmailRequiredDataDb(Guid approvalId)
+        {
+            try
+            {
+                var param = new
+                {
+                    ApprovalId = approvalId
+                };
+
+                using (var multi = await _db.QueryMultipleAsync("USP_GetItemScoreEmailRequiredData",param,commandType: CommandType.StoredProcedure))
+                {
+                    var result = new ItemScoreEmailDataModel
+                    {
+                        ItemScoreEmail = await multi.ReadFirstOrDefaultAsync<ItemScoreEmailModel>(),
+                        _To = (await multi.ReadAsync<string>()).ToList(),
+                        _Cc = (await multi.ReadAsync<string>()).ToList(),
+                        _Bcc = (await multi.ReadAsync<string>()).ToList()
+                    };
+
+                    return result;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> UpdateItemScoreMailStatusdb(bool Status, string FailedMessage, Guid ApprovalId)
+        {
+            try
+            {
+                var param = new
+                {
+                    Status,
+                    FailedMessage,
+                    ApprovalId
+                };
+                var res = await _db.ExecuteScalarAsync<int>(
+                    "USP_UpdateItemScoreMailStatus",
                     param,
                     commandType: CommandType.StoredProcedure);
 

@@ -198,26 +198,56 @@ namespace GromaxMobileApis.Models.Services
             public List<GetSparePartsOrderResponse> Data { get; set; }
                 = new List<GetSparePartsOrderResponse>();
 
-            public int TotalRecords { get; set; }
+            public int? TotalRecords { get; set; }
+            public decimal? TotalRecordsValue { get; set; }
+            public int? TotalPendingInvoice { get; set; }
+            public decimal? TotalPendingInvoiceValue { get; set; }
+            public int? TotalPendingPayment { get; set; }
+            public decimal? TotalPendingPaymentValue { get; set; }
+            public int? TotalPendingDelivered { get; set; }
+            public decimal? TotalPendingDeliveredValue { get; set; }
+
         }
 
         public class GetSparePartsOrderResponse
         {
             public Guid OrderId { get; set; }
             public string OrderNo { get; set; }
-            public DateTime OrderDate { get; set; }
+            public DateTime? OrderDate { get; set; }
             public string DealerCode { get; set; }
+
+
+
+            public string DealerName { get; set; }
+            public string DealerLocation { get; set; }
+            public string DealerState { get; set; }
+
             public string OrderStatus { get; set; }
-            public decimal TotalQty { get; set; }
-            public decimal TotalAmount { get; set; }
+            public decimal? TotalQty { get; set; }
+            public decimal? TotalAmount { get; set; }
             public string PaymentStatus { get; set; }
-            public decimal PaidAmount { get; set; }
-            public decimal BalanceAmount { get; set; }
+            public decimal? PaidAmount { get; set; }
+            public decimal? BalanceAmount { get; set; }
             public string CreatedBy { get; set; }
-            public DateTime CreatedDate { get; set; }
-            public decimal TotalGSTAmount { get; set; }
+            public DateTime? CreatedDate { get; set; }
+            public decimal? TotalGSTAmount { get; set; }
             public bool IsInvoicing { get; set; }
             public bool IsDelivered { get; set; }
+            public bool IsPaymentSuccess { get; set; }
+            public decimal? PaymentAmount { get; set; }
+            public decimal? InvTaxableAmount { get; set; }
+            public decimal? InvTaxAmount { get; set; }
+            public decimal? InvTotalAmount { get; set; }
+            public DateTime? PaymentDate { get; set; }
+            public string PaymentMode { get; set; }
+            public string ReferenceNo { get; set; }
+            public string Remarks { get; set; }
+            public string TransactionId { get; set; }
+            public string DocketNumber { get; set; }
+            public string InvoiceNumber { get; set; }
+            public string PDFUrl { get; set; }
+            public DateTime? DeliveryDate { get; set; }
+            public DateTime? InvoiceDate { get; set; }
         }
 
         public class GetSparePartsOrderDetailResponse
@@ -237,6 +267,7 @@ namespace GromaxMobileApis.Models.Services
             public decimal? Ndp { get; set; }
             public string Desc { get; set; }
             public string Material { get; set; }
+            public decimal CurrentQty { get; set; }
         }
 
         public class UpdateSparePartsOrderItemRequest : IValidatableObject

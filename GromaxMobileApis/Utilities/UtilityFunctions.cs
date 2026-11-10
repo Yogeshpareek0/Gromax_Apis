@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using LicenseContext = OfficeOpenXml.LicenseContext;
@@ -1090,6 +1091,59 @@ namespace GromaxMobileApis.Utilities
                 }
             }
 
+            #endregion
+
+
+            #region Point Images
+
+            tables.PointImages = new DataTable();
+
+            tables.PointImages.Columns.Add("PointId", typeof(Guid));
+            tables.PointImages.Columns.Add("Image", typeof(string));
+
+            if (model.PointImages != null)
+            {
+                foreach (var item in model.PointImages)
+                {
+                    tables.PointImages.Rows.Add(
+                        item.PointId,
+                        item.Image
+                    );
+                }
+            }
+
+            #endregion
+
+            return tables;
+        }
+
+        public static ReimbursementDataTables UpdateReimbursementDataTables(UpdateReimbursementRequest model)
+        {
+            ReimbursementDataTables tables = new ReimbursementDataTables();
+            //        var points = model.Points?
+            //.Where(x => string.Equals(
+            //    x.status?.Trim(),
+            //    "Changed",
+            //    StringComparison.OrdinalIgnoreCase))
+            //.ToList();
+
+            #region Points
+
+            tables.Points = new DataTable();
+
+            tables.Points.Columns.Add("PointId", typeof(Guid));
+            tables.Points.Columns.Add("Score", typeof(decimal));
+
+            if (model.Points != null)
+            {
+                foreach (var item in model.Points)
+                {
+                    tables.Points.Rows.Add(
+                        item.PointId,
+                        item.Score
+                    );
+                }
+            }
             #endregion
 
 

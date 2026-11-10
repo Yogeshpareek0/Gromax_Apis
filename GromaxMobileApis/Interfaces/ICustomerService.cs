@@ -11,6 +11,7 @@ using System.Dynamic;
 using System.Threading.Tasks;
 using static GromaxMobileApis.Models.Services.FieldTechnicalReportModel;
 using static GromaxMobileApis.Models.Services.SparePartsModel;
+using static GromaxMobileApis.Models.Services.WarrantyClaimModel;
 
 namespace GromaxMobileApis.Interfaces
 {
@@ -76,7 +77,7 @@ namespace GromaxMobileApis.Interfaces
         Task<IEnumerable<dynamic>> getReimbursementAppListdb();
 
         Task<int> InsertMechanicDb(MechanicCreateRequest m);
-        Task<IEnumerable<MechanicMaster>> getMechanicListdb(MechanicApprovalFilterRequest m);
+        Task<IEnumerable<MechanicMasterDataModel>> getMechanicListdb(MechanicApprovalFilterRequest m);
 
         Task<int> MechanicApprovalDb(MechanicApprovalRequest m);
 
@@ -117,13 +118,44 @@ namespace GromaxMobileApis.Interfaces
         Task<SparePartsPaginationResponse> getSparePartsPaginationdb(int pageNumber, int pageSize, string partCodeOrName, string category);
 
 
-        Task<SparePartsOrderListResponse> GetSparePartsOrdersdb(int pageNumber, int pageSize);
+        Task<SparePartsOrderListResponse> GetSparePartsOrdersdb(
+        int pageNumber,
+        int pageSize,
+        string DealerCode,
+        string StateName,
+        string Duration,
+        DateTime? StDate,
+        DateTime? EnDate,
+        string OrderNo,
+        int IsDownload);
 
         Task<List<GetSparePartsOrderDetailResponse>> GetSparePartsOrderDetailsdb(string orderId);
 
         Task<UpdateSparePartsOrderItemResponse> UpdateSparePartsOrderItem(UpdateSparePartsOrderItemRequest model);
         Task<CreateSpareOrderInvoiceResponse> CreateSpareOrderInvoice(CreateSpareOrderInvoiceRequest model);
         Task<SpareOrderInvoiceResponse> GetSpareOrderInvoice(string orderId);
+
+
+        Task<IEnumerable<dynamic>> GetClosedJobCardListdb(ClosedJobCardListRequest request);
+        Task<IEnumerable<dynamic>> getSparePartListByJobCardIddb(Guid Id);
+
+        Task<int> SaveWarrantyClaimdb(WarrantyClaimRequest request);
+
+        Task<IEnumerable<dynamic>> getPendingWarrantyClaimListdb();
+        Task<IEnumerable<dynamic>> getWarrantySparesByMasterIddb(Guid Id);
+        Task<int> UpdateWarrantyClaimApprovaldb(WarrantyClaimApprovalRequest request);
+        Task<int> UpdateWarrantyClaimdb(UpdateWarrantyClaimRequest request);
+
+        Task<getReimbursementScoreListByIdModel> getReimbursementScoreListById(string Id);
+        Task<IEnumerable<dynamic>> getItemScoreApprovalPendingReportDb();
+
+        Task<int> UpdateReimbursementScoreDb(UpdateReimbursementRequest m, ReimbursementDataTables dt);
+        Task<int> ApproveReimbursementScoreDb(ApproveReimbursementRequest m);
+        Task<ItemScoreEmailDataModel> getItemScoreEmailRequiredDataDb(Guid approvalId);
+
+        Task<int> UpdateItemScoreMailStatusdb(bool Status, string FailedMessage,Guid ApprovalId);
+
+
 
 
 

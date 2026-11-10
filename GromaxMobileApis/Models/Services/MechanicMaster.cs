@@ -157,4 +157,54 @@ namespace GromaxMobileApis.Models.Services
         public IEnumerable<dynamic> ServiceManagerList { get; set; }
         public IEnumerable<dynamic> SkillLevelList { get; set; }
     }
+
+    public class MechanicMasterDataModel
+    {
+        public Guid MechanicID { get; set; }
+
+        public string DealerCode { get; set; }
+        public string DealerName { get; set; }
+        public string StateName { get; set; }
+        public string Location { get; set; }
+        public string MechanicName { get; set; }
+        public string ContactNo { get; set; }
+        public string AadharCardNo { get; set; }
+        public string TypeOfMechanic { get; set; }
+
+        public string Education { get; set; }
+        public int? ExperienceInGromax { get; set; }
+        public string PriorExperience { get; set; }
+        public int? PriorExperienceYears { get; set; }
+        public int? TotalExperience { get; set; }
+
+        public int PhysicalTrainingCount { get; set; }
+        public int VirtualTrainingCount { get; set; }
+
+        public string InstallationAttendance { get; set; }
+        public string HydraulicAttendance { get; set; }
+        public string EngineAttendance { get; set; }
+        public string CompleteTractorTraining { get; set; }
+        public string SystemAndProcess { get; set; }
+
+        public string SkillLevel { get; set; }
+        public string ServiceManpower { get; set; }
+
+        public string ApprovalStatus { get; set; }
+
+        public string ApprovedBy { get; set; }
+        public DateTime? ApprovedDate { get; set; }
+
+        public string RejectedBy { get; set; }
+        public DateTime? RejectedDate { get; set; }
+        public string RejectedRemark { get; set; }
+
+        public DateTime CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
+
+        public DateTime? ModifiedDate { get; set; }
+        public string ModifiedBy { get; set; }
+
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedDate { get; set; }
+    }
 }

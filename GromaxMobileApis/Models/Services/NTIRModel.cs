@@ -100,4 +100,67 @@ namespace GromaxMobileApis.Models.Services
 
     }
 
+    //public class getReimbursementScoreListByIdModel
+    //{
+    //    public IEnumerable<dynamic> Report { get; set; }
+    //    public IEnumerable<dynamic> Images { get; set; }
+
+
+    //}
+
+    public class getReimbursementScoreListByIdModel
+    {
+        public List<ReimbursementScoreDetailModel> report { get; set; } = new();
+    }
+
+    public class ReimbursementScoreDetailModel
+    {
+        public Guid Id { get; set; }                 // ReimbursementScoreDetailId
+        public string PointId { get; set; }          // point master id (update me pointId yahi jayega)
+        public string DealerCode { get; set; }
+        public string catType { get; set; }
+        public string score { get; set; }
+        public string groupName { get; set; }
+        public string groupItem { get; set; }
+        public string cat { get; set; }
+        public int? maxScore { get; set; }
+        public bool isInput { get; set; }
+        public string units { get; set; }
+        public int? minPhoto { get; set; }
+        public int? maxPhoto { get; set; }
+        public List<string> images { get; set; } = new();
+    }
+
+    public class ReimbursementScoreImageModel
+    {
+        public Guid ReimbursementScoreDetailId { get; set; }
+        public string ImagesUrl { get; set; }
+    }
+
+
+    public class ItemScoreEmailModel
+    {
+        public string DealerName { get; set; }
+        public string AssessmentMonth { get; set; }
+        public DateTime? AssessmentDate { get; set; }
+
+        public decimal InfrastructureScore { get; set; }
+        public decimal ToolsScore { get; set; }
+        public decimal EnvironmentScore { get; set; }
+        public decimal ManpowerScore { get; set; }
+
+        public decimal TotalScore { get; set; }
+        public decimal ScorePercentage { get; set; }
+
+        public string DealerCategory { get; set; }
+    }
+
+    public class ItemScoreEmailDataModel
+    {
+        public ItemScoreEmailModel ItemScoreEmail { get; set; }
+        public List<string> _To { get; set; }
+        public List<string> _Cc { get; set; }
+        public List<string> _Bcc { get; set; }
+    }
+
 }

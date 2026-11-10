@@ -5,6 +5,7 @@ using GromaxMobileApis.Models;
 using GromaxMobileApis.Models.DealerMaster;
 using GromaxMobileApis.Models.Services;
 using GromaxMobileApis.Models.VerifyWebhook;
+using GromaxMobileApis.Services;
 using GromaxMobileApis.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -30,6 +31,7 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using static GromaxMobileApis.Models.Services.FieldTechnicalReportModel;
 using static GromaxMobileApis.Models.Services.SparePartsModel;
+using static GromaxMobileApis.Models.Services.WarrantyClaimModel;
 
 namespace GromaxMobileApis.Controllers
 {
@@ -981,7 +983,7 @@ namespace GromaxMobileApis.Controllers
             try
             {
                 var l = await _customerService.getMechanicListdb(m);
-                return Ok(ApiResponse<IEnumerable<MechanicMaster>>.Success(l));
+                return Ok(ApiResponse<IEnumerable<MechanicMasterDataModel>>.Success(l));
             }
             catch (Exception ex)
             {
@@ -1504,7 +1506,7 @@ namespace GromaxMobileApis.Controllers
         /// </summary>
         [HttpPost]
         [Route(GromaxMobileApis.Utilities.customerServices.spareParts.saveSparePartsOrder)]
-        //[Authorize(Roles = "Dealer")]
+        [Authorize(Roles = "Dealer")]
         public async Task<IActionResult> SaveSparePartsOrder([FromBody] SparePartsOrderRequest m)
         {
             try
@@ -1545,7 +1547,7 @@ namespace GromaxMobileApis.Controllers
 
         [HttpPost]
         [Route(GromaxMobileApis.Utilities.customerServices.spareParts.updateSparePartsOrderPayment)]
-        //[Authorize(Roles = "Dealer")]
+        [Authorize(Roles = "Dealer")]
         public async Task<IActionResult> UpdateSparePartsOrderPayment([FromBody] UpdateSparePartsPaymentRequest m)
         {
             try
@@ -1678,6 +1680,7 @@ namespace GromaxMobileApis.Controllers
 
         [HttpGet]
         [Route(GromaxMobileApis.Utilities.customerServices.spareParts.getSparePartsPagination)]
+        //[Authorize(Roles = "Dealer")]
         public async Task<IActionResult> getSparePartsPagination(int pageNumber = 1, int pageSize = 20, string partCodeOrName = null, string category = null)
         {
             try
@@ -1705,7 +1708,16 @@ namespace GromaxMobileApis.Controllers
         [HttpGet]
         [Route(GromaxMobileApis.Utilities.customerServices.spareParts.getSparePartsOrders)]
         //[Authorize(Roles = "Dealer")]
-        public async Task<IActionResult> GetSparePartsOrders([FromQuery] int pageNumber = 1, int pageSize = 20)
+        public async Task<IActionResult> GetSparePartsOrders(
+                 int pageNumber = 1,
+                 int pageSize = 20,
+                 string DealerCode = "All",
+                 string StateName = "All",
+                 string Duration = "this Month",
+                 DateTime? StDate = null,
+                 DateTime? EnDate = null,
+                 string OrderNo = null,
+                 int IsDownload = 0)
         {
             try
             {
@@ -1720,7 +1732,7 @@ namespace GromaxMobileApis.Controllers
                     );
 
                 var result = await _customerService
-                    .GetSparePartsOrdersdb(pageNumber, pageSize);
+     .GetSparePartsOrdersdb(pageNumber, pageSize, DealerCode, StateName, Duration, StDate, EnDate, OrderNo, IsDownload);
 
                 if (result == null)
                 {
@@ -1789,7 +1801,7 @@ namespace GromaxMobileApis.Controllers
 
         [HttpPost]
         [Route(GromaxMobileApis.Utilities.customerServices.spareParts.updateSparePartsOrderItem)]
-        //[Authorize(Roles = "Dealer")]
+        [Authorize(Roles = "Dealer")]
         public async Task<IActionResult> UpdateSparePartsOrderItem([FromBody] UpdateSparePartsOrderItemRequest m)
         {
             try
@@ -1843,6 +1855,7 @@ namespace GromaxMobileApis.Controllers
 
         [HttpPost]
         [Route(GromaxMobileApis.Utilities.customerServices.spareParts.createSpareOrderInvoice)]
+        [Authorize(Roles = "National Service Head")]
         public async Task<IActionResult> CreateSpareOrderInvoice([FromForm] CreateSpareOrderInvoiceRequest m)
         {
             try
@@ -1938,6 +1951,396 @@ namespace GromaxMobileApis.Controllers
                 );
             }
         }
+
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.warrantyClaim.getClosedJobCardList)]
+        public async Task<IActionResult> GetClosedJobCardList([FromQuery] ClosedJobCardListRequest request)
+        {
+            try
+            {
+                var result = await _customerService.GetClosedJobCardListdb(request);
+
+                if (result == null)
+                {
+                    return NotFound(
+                        ApiResponse<string>.NotFound("Record not found.")
+                    );
+                }
+
+                return Ok(
+                    ApiResponse<IEnumerable<dynamic>>.Success(result)
+                );
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+        }
+
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.warrantyClaim.getSparePartListByJobCardId)]
+        public async Task<IActionResult> getSparePartListByJobCardId([FromQuery][Required] Guid JobCardMasterId)
+        {
+            try
+            {
+                var result = await _customerService.getSparePartListByJobCardIddb(JobCardMasterId);
+
+                if (result == null)
+                {
+                    return NotFound(
+                        ApiResponse<string>.NotFound("Record not found.")
+                    );
+                }
+
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(result));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+        }
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.warrantyClaim.saveWarrantyClaim)]
+        public async Task<IActionResult> SaveWarrantyClaim([FromBody] WarrantyClaimRequest request)
+        {
+            try
+            {
+                var result = await _customerService.SaveWarrantyClaimdb(request);
+                if (result < 1)
+                    return BadRequest(ApiResponse<string>.BadRequest("Failed to create warranty claim. Please try again."));
+                return Ok(ApiResponse<int>.Created());
+            }
+            catch (SqlException ex)
+            {
+                if (ex?.Number == 500001)
+                {
+                    return StatusCode(500, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+                }
+                return StatusCode(500, ApiResponse<string>.Fail("Something Wrong."));
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.warrantyClaim.getPendingWarrantyClaimList)]
+        public async Task<IActionResult> getPendingWarrantyClaimList()
+        {
+            try
+            {
+                var result = await _customerService.getPendingWarrantyClaimListdb();
+
+                if (result == null)
+                {
+                    return NotFound(
+                        ApiResponse<string>.NotFound("Record not found.")
+                    );
+                }
+
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(result));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+        }
+
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.warrantyClaim.getWarrantySparesByMasterId)]
+        public async Task<IActionResult> getWarrantySparesByMasterId([FromQuery][Required] Guid WarrantyClaimMasterId)
+        {
+            try
+            {
+                var result = await _customerService.getWarrantySparesByMasterIddb(WarrantyClaimMasterId);
+
+                if (result == null)
+                {
+                    return NotFound(
+                        ApiResponse<string>.NotFound("Record not found.")
+                    );
+                }
+
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(result));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+        }
+
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.warrantyClaim.UpdateWarrantyClaimApproval)]
+        public async Task<IActionResult> UpdateWarrantyClaimApproval([FromBody] WarrantyClaimApprovalRequest request)
+        {
+            try
+            {
+                var result = await _customerService.UpdateWarrantyClaimApprovaldb(request);
+                if (result < 1)
+                    return BadRequest(ApiResponse<string>.BadRequest("Failed to Approve warranty claim. Please try again."));
+                return Ok(ApiResponse<int>.Created());
+            }
+            catch (SqlException ex)
+            {
+                if (ex?.Number == 500001)
+                {
+                    return StatusCode(500, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+                }
+                return StatusCode(500, ApiResponse<string>.Fail("Something Wrong."));
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.warrantyClaim.UpdateWarrantyClaim)]
+        public async Task<IActionResult> UpdateWarrantyClaim([FromBody] UpdateWarrantyClaimRequest request)
+        {
+            try
+            {
+                var result = await _customerService.UpdateWarrantyClaimdb(request);
+                if (result < 1)
+                    return BadRequest(ApiResponse<string>.BadRequest("Failed to Update warranty claim. Please try again."));
+                return Ok(ApiResponse<int>.Created());
+            }
+            catch (SqlException ex)
+            {
+                if (ex?.Number == 500001)
+                {
+                    return StatusCode(500, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+                }
+                return StatusCode(500, ApiResponse<string>.Fail("Something Wrong."));
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+
+
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.reimbursement.getReimbursementScoreListById)]
+        public async Task<IActionResult> getReimbursementScoreListById([FromQuery][Required] string ScoreId)
+        {
+            try
+            {
+                var l = await _customerService.getReimbursementScoreListById(ScoreId);
+                return Ok(ApiResponse<getReimbursementScoreListByIdModel>.Success(l));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.reimbursement.getItemScoreApprocalPendList)]
+        public async Task<IActionResult> getItemScoreApprocalPendList()
+        {
+            try
+            {
+                var l = await _customerService.getItemScoreApprovalPendingReportDb();
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(l));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.reimbursement.updateReimbursementScore)]
+        public async Task<IActionResult> updateReimbursementScore([FromBody] UpdateReimbursementRequest m)
+        {
+            try
+            {
+                ReimbursementDataTables dataTables = new ReimbursementDataTables();
+                try
+                {
+                    dataTables = UtilityFunctions.UpdateReimbursementDataTables(m);
+                }
+                catch
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, ApiResponse<string>.BadRequest("Unable to proceed dt conversion."));
+                }
+                int r = 0;
+                try
+                {
+                    r = await _customerService.UpdateReimbursementScoreDb(m, dataTables);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex.Number == 500001)
+                        return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+                }
+                if (r <= 0)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail("Unable to Add Reimbursement Score."));
+                }
+
+                return Ok(
+                    ApiResponse<string>.Success("Reimbursement Score update successfully."));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+
+        [HttpPost]
+        [Route(GromaxMobileApis.Utilities.customerServices.reimbursement.approveReimbursementScore)]
+        public async Task<IActionResult> approveReimbursementScore([FromBody] ApproveReimbursementRequest m)
+        {
+            try
+            {
+                int r = 0;
+                try
+                {
+                    r = await _customerService.ApproveReimbursementScoreDb(m);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex.Number == 500001)
+                        return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+                }
+                if (r <= 0)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail("Unable to Approve Reimbursement Score."));
+                }
+                //if (m.Status == 1)
+                //{
+                //    ItemScoreEmailDataModel emailData = new ItemScoreEmailDataModel();
+                //    try
+                //    {
+                //        emailData = await _customerService.getItemScoreEmailRequiredDataDb(m.ApprovalId);
+                //    }
+                //    catch
+                //    {
+                //        var i = await _customerService.UpdateItemScoreMailStatusdb(false, "error found on getItemScoreEmailRequiredDataDb Function", m.ApprovalId);
+                //        return Ok(ApiResponse<string>.Success("Reimbursement Score Approved successfully."));
+                //    }
+                //    if (emailData._To.Count < 1)
+                //    {
+                //        var i = await _customerService.UpdateItemScoreMailStatusdb(false, "Data not found in (TO) List", m.ApprovalId);
+                //        return Ok(ApiResponse<string>.Success("Reimbursement Score Approved successfully."));
+                //    }
+                //    if (emailData._Cc.Count < 1)
+                //    {
+                //        var i = await _customerService.UpdateItemScoreMailStatusdb(false, "Data not found in (CC) List", m.ApprovalId);
+                //        return Ok(ApiResponse<string>.Success("Reimbursement Score Approved successfully."));
+                //    }
+                //    bool result = false;
+                //    try
+                //    {
+                //        string emailBody = EmailTemplateHelper.GenerateItemScoreEmailBody(emailData.ItemScoreEmail);
+
+                //        // Send Email
+                //        result = await EmailService.SendEmailAsync(new EmailService.EmailRequest
+                //        {
+                //            To = emailData._To,
+                //            Cc = emailData._Cc,
+                //            Bcc = emailData._Bcc.Count > 1 ? emailData._Bcc : new(),
+                //            Subject = $"ITEM Score Assessment Report & Dealer Category - {emailData.ItemScoreEmail.AssessmentMonth}",
+                //            Body = emailBody,
+                //            IsHtml = true
+                //        });
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        var i = await _customerService.UpdateItemScoreMailStatusdb(false, ex.Message, m.ApprovalId);
+                //        return Ok(ApiResponse<string>.Success("Reimbursement Score Approved successfully."));
+                //    }
+
+                //    try
+                //    {
+                //        var i = await _customerService.UpdateItemScoreMailStatusdb(result, null, m.ApprovalId);
+                //    }
+                //    catch
+                //    {
+                //        return Ok(ApiResponse<string>.Success("Reimbursement Score Approved successfully."));
+                //    }
+                //}
+
+                return Ok(ApiResponse<string>.Success("Reimbursement Score Approved successfully."));
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
+
+        //[HttpPost("SendAssessmentEmail")]
+        //public async Task<IActionResult> SendAssessmentEmail([FromBody] ItemScoreEmailModel model)
+        //{
+        //    try
+        //    {
+        //        if (model == null)
+        //            return BadRequest("Invalid request.");
+
+        //        // Generate Email Body
+        //        string emailBody =
+        //            EmailTemplateHelper.GenerateItemScoreEmailBody(model);
+
+        //        // Send Email
+        //        bool result = await EmailService.SendEmailAsync(
+        //            new EmailService.EmailRequest
+        //            {
+        //                To = new List<string> { "ykp900155@gmail.com" },
+        //                Subject = $"ITEM Score Assessment Report & Dealer Category - {model.AssessmentMonth}",
+        //                Body = emailBody,
+        //                IsHtml = true
+        //            });
+
+        //        if (!result)
+        //        {
+        //            return StatusCode(500, ApiResponse<string>.Fail("Email sending failed."));
+        //        }
+
+        //        return StatusCode(200, ApiResponse<string>.Success("Email sent successfully."));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, ApiResponse<string>.Fail(ex.Message));
+        //    }
+        //}
+
+
 
         //[AllowAnonymous]
         //[HttpGet]

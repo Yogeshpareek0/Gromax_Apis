@@ -461,6 +461,17 @@ namespace GromaxMobileApis.Utilities
 
         }
 
+        public static class warrantyClaim
+        {
+            public const string getClosedJobCardList = Base + "getClosedJobCardList";
+            public const string getSparePartListByJobCardId = Base + "getSparePartListByJobCardId";
+            public const string saveWarrantyClaim = Base + "saveWarrantyClaim";
+            public const string getPendingWarrantyClaimList = Base + "getPendingWarrantyClaimList";
+            public const string getWarrantySparesByMasterId = Base + "getWarrantySparesByMasterId";
+            public const string UpdateWarrantyClaimApproval = Base + "UpdateWarrantyClaimApproval";
+            public const string UpdateWarrantyClaim = Base + "UpdateWarrantyClaim";
+        }
+
         public static class invoice
         {
             public const string service = Base + "serviceInvoice";
@@ -476,6 +487,11 @@ namespace GromaxMobileApis.Utilities
             public const string insertReimbursementScore = Base + "insertReimbursementScore";
             public const string getReimbursementMasterListApps = Base + "getReimbursementMasterListApps";
             public const string getItemScoreReport = Base + "getItem-ScoreReport";
+            public const string getReimbursementScoreListById = Base + "getReimbursementScoreListById";
+            public const string getItemScoreApprocalPendList = Base + "getItemScoreApprocalPendList";
+            public const string updateReimbursementScore = Base + "updateReimbursementScore";
+            public const string approveReimbursementScore = Base + "approveReimbursementScore";
+
 
 
         }

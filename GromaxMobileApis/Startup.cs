@@ -122,8 +122,7 @@ namespace GromaxMobileApis
             //});
             //        });
 
-            services.AddScoped<IDbConnection>(sp =>
- new SqlConnection(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped<IDbConnection>(sp =>new SqlConnection(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IDatabaseService, DatabaseService>();
             services.AddScoped<ICircularService, CircularService>();
             services.AddScoped<IDatabaseServicesweb, DatabaseServicesweb>();
@@ -139,6 +138,7 @@ namespace GromaxMobileApis
             services.AddScoped<IUser, User>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddSwaggerDocumentation();
+            EmailService.Initialize(Configuration);
 
 
             var jwtSection = Configuration.GetSection("Jwt");
