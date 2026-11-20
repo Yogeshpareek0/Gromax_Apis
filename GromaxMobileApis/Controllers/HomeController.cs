@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor.Internal;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
@@ -1739,7 +1740,20 @@ namespace GromaxMobileApis.Controllers
                 string mobileNumber = User.FindFirst("mobilenumber")?.Value;
                 string PlatformType = User.FindFirst("PlatformType")?.Value;
                 /////var result = await _db.GenerateSalesEnquiryv1(model, dealerCode, username, mobileNumber);
-                var result = await _db.GenerateSalesEnquiryv2(model, dealerCode, username, mobileNumber, PlatformType, null);
+                ///
+                var result = 0;
+                try
+                {
+                    result = await _db.GenerateSalesEnquiryv2(model, dealerCode, username, mobileNumber, PlatformType, null);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex.Number == 500001)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+                    }
+                    return Ok(ApiResponse<string>.Fail("Error"));
+                }
                 //var result = 1;
 
                 if (result > 0)
@@ -1785,7 +1799,19 @@ namespace GromaxMobileApis.Controllers
                 string mobileNumber = User.FindFirst("mobilenumber")?.Value;
                 string PlatformType = User.FindFirst("PlatformType")?.Value;
                 /////var result = await _db.GenerateSalesEnquiryv1(model, dealerCode, username, mobileNumber);
-                var result = await _db.GenerateSalesEnquiryv2(model, dealerCode, username, mobileNumber, PlatformType, file1);
+                var result = 0;
+                try
+                {
+                    result = await _db.GenerateSalesEnquiryv2(model, dealerCode, username, mobileNumber, PlatformType, file1);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex.Number == 500001)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+                    }
+                    return Ok(ApiResponse<string>.Fail("Error"));
+                }
                 //var result = 1;
 
                 if (result > 0)
@@ -1873,8 +1899,20 @@ namespace GromaxMobileApis.Controllers
                 string username = User.FindFirst(ClaimTypes.Name)?.Value;
                 string mobileNumber = User.FindFirst("mobilenumber")?.Value;
                 string PlatformType = User.FindFirst("PlatformType")?.Value;
-                //   //var result = await _db.GenerateSalesEnquiryv1(model, dealerCode, username, mobileNumber);
-                var result = await _db.updtGenerateSalesEnquiryv2(model, dealerCode, username, mobileNumber, PlatformType, null);
+                //var result = await _db.GenerateSalesEnquiryv1(model, dealerCode, username, mobileNumber);
+                var result = 0;
+                try
+                {
+                    result = await _db.updtGenerateSalesEnquiryv2(model, dealerCode, username, mobileNumber, PlatformType, null);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex.Number == 500001)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+                    }
+                    return Ok(ApiResponse<string>.Fail("Error"));
+                }
                 //var result = 0;
                 if (result > 0)
                     return Ok(ApiResponse<string>.Success(default));
@@ -1919,7 +1957,20 @@ namespace GromaxMobileApis.Controllers
                 string mobileNumber = User.FindFirst("mobilenumber")?.Value;
                 string PlatformType = User.FindFirst("PlatformType")?.Value;
                 //   //var result = await _db.GenerateSalesEnquiryv1(model, dealerCode, username, mobileNumber);
-                var result = await _db.updtGenerateSalesEnquiryv2(model, dealerCode, username, mobileNumber, PlatformType, file1);
+                var result = 0;
+                try
+                {
+                    result = await _db.updtGenerateSalesEnquiryv2(model, dealerCode, username, mobileNumber, PlatformType, file1);
+                }
+                catch (SqlException ex)
+                {
+                    if (ex.Number == 500001)
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message));
+                    }
+                    return Ok(ApiResponse<string>.Fail("Error"));
+
+                }
                 //var result = 0;
                 if (result > 0)
                     return Ok(ApiResponse<string>.Success(default));

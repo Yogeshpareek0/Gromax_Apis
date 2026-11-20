@@ -470,6 +470,7 @@ namespace GromaxMobileApis.Utilities
             public const string getWarrantySparesByMasterId = Base + "getWarrantySparesByMasterId";
             public const string UpdateWarrantyClaimApproval = Base + "UpdateWarrantyClaimApproval";
             public const string UpdateWarrantyClaim = Base + "UpdateWarrantyClaim";
+            public const string GetWarrantyClaimsCount = Base + "GetWarrantyClaimsCount";
         }
 
         public static class invoice

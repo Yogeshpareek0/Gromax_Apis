@@ -10,6 +10,7 @@ using GromaxMobileApis.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Logging;
@@ -1388,20 +1389,36 @@ namespace GromaxMobileApis.Controllers
             }
         }
 
-        //[HttpGet]
-        //[Route(GromaxMobileApis.Utilities.customerServices.FTR.getFTRById)]
-        //public async Task<IActionResult> getFTRById([FromQuery][Required] Guid id)
-        //{
-        //    try
-        //    {
-        //        var l = await _customerService.getFtrById(id);
-        //        return Ok(ApiResponse<IEnumerable<dynamic>>.Success(l));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
-        //    }
-        //}
+
+        //Uncommented the `getFTRById` API and added the `JobCardId` parameter to fetch FTR details based on the selected Job Card.
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.FTR.getFTRById)]
+        public async Task<IActionResult> getFTRById([FromQuery] string Ftrid, string JobCardId)
+        {
+            try
+            {
+                Guid? FTR_ID = null;
+                Guid? JOB_ID = null;
+                if (!string.IsNullOrEmpty(Ftrid))
+                {
+                    FTR_ID = Guid.Parse(Ftrid);
+                }
+                if (!string.IsNullOrEmpty(JobCardId))
+                {
+                    JOB_ID = Guid.Parse(JobCardId);
+                }
+                if (FTR_ID is null && JOB_ID is null)
+                {
+                    return BadRequest(ApiResponse<string>.BadRequest("Either FTR ID or Job Card ID is required. Please provide at least one."));
+                }
+                var l = await _customerService.getFtrById(FTR_ID, JOB_ID);
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(l));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
+            }
+        }
 
         [HttpGet]
         [Route(GromaxMobileApis.Utilities.customerServices.FTR.getFTRData)]
@@ -2038,11 +2055,11 @@ namespace GromaxMobileApis.Controllers
 
         [HttpGet]
         [Route(GromaxMobileApis.Utilities.customerServices.warrantyClaim.getPendingWarrantyClaimList)]
-        public async Task<IActionResult> getPendingWarrantyClaimList()
+        public async Task<IActionResult> getPendingWarrantyClaimList([FromQuery][Required] string ClaimStatus)
         {
             try
             {
-                var result = await _customerService.getPendingWarrantyClaimListdb();
+                var result = await _customerService.getPendingWarrantyClaimListdb(ClaimStatus);
 
                 if (result == null)
                 {
@@ -2303,6 +2320,33 @@ namespace GromaxMobileApis.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(ex.Message));
             }
         }
+
+        [HttpGet]
+        [Route(GromaxMobileApis.Utilities.customerServices.warrantyClaim.GetWarrantyClaimsCount)]
+        public async Task<IActionResult> GetWarrantyClaimsCount()
+        {
+            try
+            {
+                var result = await _customerService.GetWarrantyClaimsCountdb();
+
+                if (result == null)
+                {
+                    return NotFound(
+                        ApiResponse<string>.NotFound("Record not found.")
+                    );
+                }
+
+                return Ok(ApiResponse<dynamic>.Success(result));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail(ex.Message)
+                );
+            }
+        }
+
 
 
         //[HttpPost("SendAssessmentEmail")]

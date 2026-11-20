@@ -1796,7 +1796,7 @@ namespace GromaxMobileApis.Services
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw;
             }
         }
 
@@ -1973,7 +1973,7 @@ namespace GromaxMobileApis.Services
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw;
             }
         }
 

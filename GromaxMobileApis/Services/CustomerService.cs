@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ using YamlDotNet.Core;
 using static GromaxMobileApis.Models.Services.FieldTechnicalReportModel;
 using static GromaxMobileApis.Models.Services.SparePartsModel;
 using static GromaxMobileApis.Models.Services.WarrantyClaimModel;
+using static GromaxMobileApis.Utilities.customerServices;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace GromaxMobileApis.Services
@@ -978,7 +980,8 @@ namespace GromaxMobileApis.Services
                     m.duration,
                     m.stDate,
                     m.enDate,
-                    m.isDownload
+                    m.isDownload,
+                    m.Type
                 };
                 using (var multi = await _db.QueryMultipleAsync("usp_pdiReport", param, commandType: CommandType.StoredProcedure))
                 {
@@ -1017,7 +1020,8 @@ namespace GromaxMobileApis.Services
                     m.duration,
                     m.stDate,
                     m.enDate,
-                    m.isDownload
+                    m.isDownload,
+                    m.Type
                 };
                 using (var multi = await _db.QueryMultipleAsync("usp_ntirReport", param, commandType: CommandType.StoredProcedure))
                 {
@@ -1179,11 +1183,11 @@ namespace GromaxMobileApis.Services
             }
         }
 
-        public async Task<IEnumerable<dynamic>> getFtrById(Guid id)
+        public async Task<IEnumerable<dynamic>> getFtrById(Guid? id, Guid? JobCardId)
         {
             try
             {
-                var Param = new { username = _user.GetUserName(), positionName = _user.GetPositionName(), ftrMasterId = id };
+                var Param = new { username = _user.GetUserName(), positionName = _user.GetPositionName(), ftrMasterId = id, jobCardMasterId = JobCardId };
                 var res = await _db.QueryAsync(
                   "usp_getFieldTechDataById",
                   param: Param,
@@ -1655,12 +1659,14 @@ namespace GromaxMobileApis.Services
             }
         }
 
-        public async Task<IEnumerable<dynamic>> getPendingWarrantyClaimListdb()
+        public async Task<IEnumerable<dynamic>> getPendingWarrantyClaimListdb(string ClaimStatus)
         {
             try
             {
+                var param = new { ClaimStatus, UserName = _user.GetUserName(), PositionName = _user.GetPositionName() };
                 var multi = await _db.QueryAsync(
                     "USP_GetPendingWarrantyClaimMasterList",
+                    param: param,
                     commandType: CommandType.StoredProcedure);
 
                 return multi;
@@ -1866,7 +1872,7 @@ namespace GromaxMobileApis.Services
                     ApprovalId = approvalId
                 };
 
-                using (var multi = await _db.QueryMultipleAsync("USP_GetItemScoreEmailRequiredData",param,commandType: CommandType.StoredProcedure))
+                using (var multi = await _db.QueryMultipleAsync("USP_GetItemScoreEmailRequiredData", param, commandType: CommandType.StoredProcedure))
                 {
                     var result = new ItemScoreEmailDataModel
                     {
@@ -1901,6 +1907,24 @@ namespace GromaxMobileApis.Services
                     commandType: CommandType.StoredProcedure);
 
                 return res;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<dynamic> GetWarrantyClaimsCountdb()
+        {
+            try
+            {
+                var param = new { UserName = _user.GetUserName(), PositionName = _user.GetPositionName() };
+                var res = await _db.QuerySingleOrDefaultAsync<dynamic>(
+                  "USP_getWarrantyClaimsCount",
+                  param: param,
+                  commandType: CommandType.StoredProcedure);
+                return res;
+
             }
             catch (Exception ex)
             {

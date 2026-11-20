@@ -83,6 +83,7 @@ namespace GromaxMobileApis.Models.Services
         public int pageSize { get; set; }
         public int rowStart { get; set; }
         public Boolean isDownload { get; set; } = false;
+        public string Type { get; set; } = "Not Ok";
     }
     public class NtirCountResponse
     {

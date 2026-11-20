@@ -8,6 +8,7 @@ namespace GromaxMobileApis.Models.Services
         public class GetChassisForFTRResponseModel
         {
             public Guid MasterId { get; set; }
+            public Guid JobCardId { get; set; }
             public string ModelCode { get; set; }
             public string ChasisNo { get; set; }
             public string ModelName { get; set; }

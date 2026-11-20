@@ -106,7 +106,7 @@ namespace GromaxMobileApis.Interfaces
         Task<int> addFTRdb(AddFieldTechRequestModel m);
         Task<int> updateFTRdb(UpdateFTRRequestModel m);
 
-        Task<IEnumerable<dynamic>> getFtrById(Guid id);
+        Task<IEnumerable<dynamic>> getFtrById(Guid? id, Guid? JobCardId);
         Task<IEnumerable<dynamic>> getFtrAlldataDb(GetFTRAllDataRequestModel m);
 
         Task<IEnumerable<dynamic>> getMechanicCountOnDealerDb(string dealerCode);
@@ -141,7 +141,7 @@ namespace GromaxMobileApis.Interfaces
 
         Task<int> SaveWarrantyClaimdb(WarrantyClaimRequest request);
 
-        Task<IEnumerable<dynamic>> getPendingWarrantyClaimListdb();
+        Task<IEnumerable<dynamic>> getPendingWarrantyClaimListdb(string ClaimStatus);
         Task<IEnumerable<dynamic>> getWarrantySparesByMasterIddb(Guid Id);
         Task<int> UpdateWarrantyClaimApprovaldb(WarrantyClaimApprovalRequest request);
         Task<int> UpdateWarrantyClaimdb(UpdateWarrantyClaimRequest request);
@@ -153,7 +153,10 @@ namespace GromaxMobileApis.Interfaces
         Task<int> ApproveReimbursementScoreDb(ApproveReimbursementRequest m);
         Task<ItemScoreEmailDataModel> getItemScoreEmailRequiredDataDb(Guid approvalId);
 
-        Task<int> UpdateItemScoreMailStatusdb(bool Status, string FailedMessage,Guid ApprovalId);
+        Task<int> UpdateItemScoreMailStatusdb(bool Status, string FailedMessage, Guid ApprovalId);
+
+        Task<dynamic> GetWarrantyClaimsCountdb();
+
 
 
 
