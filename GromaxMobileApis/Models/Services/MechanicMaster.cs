@@ -187,7 +187,9 @@ namespace GromaxMobileApis.Models.Services
         public string SystemAndProcess { get; set; }
 
         public string SkillLevel { get; set; }
+        public string SkillLevelName { get; set; }
         public string ServiceManpower { get; set; }
+        public string ServiceManpowerName { get; set; }
 
         public string ApprovalStatus { get; set; }
 
