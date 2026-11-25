@@ -838,7 +838,7 @@ namespace GromaxMobileApis.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Database Error: {ex.Message}");
+                throw;
             }
         }
 

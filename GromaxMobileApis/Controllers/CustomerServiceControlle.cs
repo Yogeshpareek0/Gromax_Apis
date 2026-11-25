@@ -968,6 +968,20 @@ namespace GromaxMobileApis.Controllers
                     ApiResponse<string>.Success(
                         "Mechanic inserted successfully."));
             }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 500001)
+                {
+                    return StatusCode(
+                        StatusCodes.Status500InternalServerError,
+                        ApiResponse<string>.SqlExceptionWithErrorCode(ex.Message)
+                    );
+                }
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail("Database error occurred.")
+                );
+            }
             catch (Exception ex)
             {
                 return StatusCode(
