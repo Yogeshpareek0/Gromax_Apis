@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Razor.Internal;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.DateTime;
@@ -3062,7 +3063,21 @@ namespace GromaxMobileApis.Controllers
 
         }
 
-
+        [HttpGet]
+        [Authorize(Roles = "National Sales Head")]
+        [Route(GromaxMobileApis.Utilities.ApiRoutes.Retiledsales.RetailListForReturnUpdate)]
+        public async Task<IActionResult> RetailListForReturnUpdate([FromQuery] RetailForReturnFilterRequest m)
+        {
+            try
+            {
+                var result = await _db.getRetailListForReturnUpdatedb(m);
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(result));
+            }
+            catch (Exception Ex)
+            {
+                return Ok(ApiResponse<string>.Fail(Ex.Message));
+            }
+        }
 
 
     }

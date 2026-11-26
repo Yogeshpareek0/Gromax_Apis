@@ -580,5 +580,14 @@ namespace GromaxMobileApis.Models
         [StringLength(500, MinimumLength = 1, ErrorMessage = "Return Remark must be between 3 and 500 characters.")]
         public string ReturnRemark { get; set; }
     }
+    public class RetailForReturnFilterRequest
+    {
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string Period { get; set; }
+        public string ChassisNo { get; set; }
+        public int PageSize { get; set; }
+        public int RowStart { get; set; }
+    }
 }
 

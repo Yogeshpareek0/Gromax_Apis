@@ -204,6 +204,7 @@ namespace GromaxMobileApis.Utilities
             public const string DownloadNotRetailedList = HomeBase + "DownloadNotRetailedList";
             public const string UpdateRetailSale = HomeBase + "UpdateRetailSale";
             public const string ProcessRetailReturn = HomeBase + "ProcessRetailReturn";
+            public const string RetailListForReturnUpdate = HomeBase + "RetailListForReturnUpdate";
 
         }
 

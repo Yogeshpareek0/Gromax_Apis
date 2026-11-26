@@ -2967,5 +2967,26 @@ namespace GromaxMobileApis.Services
             }
             catch { throw; }
         }
+
+        public async Task<IEnumerable<dynamic>> getRetailListForReturnUpdatedb(RetailForReturnFilterRequest m)
+        {
+            try
+            {
+                var param = new
+                {
+                    m.ChassisNo,
+                    m.EndDate,
+                    m.StartDate,
+                    m.PageSize,
+                    m.RowStart,
+                    m.Period,
+                    PositionName = _user.GetPositionName(),
+                    UserName = _user.GetUserName()
+                };
+                var result = await _db.QueryAsync("USP_getRetailListForReturnUpdate", param: param, commandType: CommandType.StoredProcedure);
+                return result;
+            }
+            catch { throw; }
+        }
     }
 }
