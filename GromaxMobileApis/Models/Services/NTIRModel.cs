@@ -129,6 +129,9 @@ namespace GromaxMobileApis.Models.Services
         public string units { get; set; }
         public int? minPhoto { get; set; }
         public int? maxPhoto { get; set; }
+        public int? ObtainScore { get; set; }
+        public DateTime ItemScoreDate { get; set; }
+        public string MarksWiseCat { get; set; }
         public List<string> images { get; set; } = new();
     }
 
