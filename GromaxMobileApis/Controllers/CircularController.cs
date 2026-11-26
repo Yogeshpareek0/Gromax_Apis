@@ -45,6 +45,8 @@ namespace GromaxMobileApis.Controllers
         }
 
         [HttpPost]
+        [RequestSizeLimit(104857600)]
+        [RequestFormLimits(MultipartBodyLengthLimit = 104857600)]
         [Route(ApiRoutes.Circular.addCirculars)]
         public async Task<IActionResult> addCirculars([FromForm] AddCircularRequest m)
         {

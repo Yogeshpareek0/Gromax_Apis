@@ -3034,6 +3034,37 @@ namespace GromaxMobileApis.Controllers
 
         }
 
+
+        [HttpPost]
+        [Authorize(Roles = "National Sales Head")]
+        [Route(GromaxMobileApis.Utilities.ApiRoutes.Retiledsales.ProcessRetailReturn)]
+        public async Task<IActionResult> ProcessRetailReturn([FromBody] RetailReturnModel m)
+        {
+            try
+            {
+                var result = await _db.ProcessRetailReturndb(m);
+                if (result > 0)
+                    return Ok(ApiResponse<string>.Created());
+                return NotFound(ApiResponse<string>.NotFound("Record not found."));
+            }
+            catch (SqlException Ex)
+            {
+                if (Ex.Number == 500001)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.SqlExceptionWithErrorCode(Ex.Message));
+                }
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail("Something went wrong."));
+            }
+            catch (Exception Ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ApiResponse<string>.Fail(Ex.Message));
+            }
+
+        }
+
+
+
+
     }
 
 

@@ -2362,7 +2362,7 @@ namespace GromaxMobileApis.Controllers
         }
 
 
-
+        //[AllowAnonymous]
         //[HttpPost("SendAssessmentEmail")]
         //public async Task<IActionResult> SendAssessmentEmail([FromBody] ItemScoreEmailModel model)
         //{

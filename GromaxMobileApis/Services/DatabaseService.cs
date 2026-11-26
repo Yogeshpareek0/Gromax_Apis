@@ -2954,5 +2954,18 @@ namespace GromaxMobileApis.Services
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
+
+        public async Task<int> ProcessRetailReturndb(RetailReturnModel m)
+        {
+            try
+            {
+                m.ReturnBy = _user.GetUserName();
+                var param = new { m.Id, m.ReturnBy, m.ReturnRemark };
+                var result = await _db.ExecuteScalarAsync<int>("usp_ProcessRetailReturn",
+                    param: param, commandType: CommandType.StoredProcedure);
+                return result;
+            }
+            catch { throw; }
+        }
     }
 }

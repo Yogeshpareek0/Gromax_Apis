@@ -27,6 +27,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Features;
 
 
 namespace GromaxMobileApis
@@ -64,6 +65,16 @@ namespace GromaxMobileApis
                 Credential = GoogleCredential.FromFile("gromax-c2226-firebase-adminsdk-fbsvc-d952eb8487.json")
             });
             services.AddHttpContextAccessor();
+            services.Configure<FormOptions>(options =>
+            {
+                options.ValueLengthLimit = int.MaxValue;
+                options.MultipartBodyLengthLimit = 104857600; // 100 MB
+                options.MultipartHeadersLengthLimit = int.MaxValue;
+            });
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.MaxRequestBodySize = 104857600; // 100 MB
+            });
             //services.AddControllers();
 
             services
@@ -122,7 +133,7 @@ namespace GromaxMobileApis
             //});
             //        });
 
-            services.AddScoped<IDbConnection>(sp =>new SqlConnection(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped<IDbConnection>(sp => new SqlConnection(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IDatabaseService, DatabaseService>();
             services.AddScoped<ICircularService, CircularService>();
             services.AddScoped<IDatabaseServicesweb, DatabaseServicesweb>();

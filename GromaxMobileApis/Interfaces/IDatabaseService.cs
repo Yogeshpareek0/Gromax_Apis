@@ -173,6 +173,8 @@ namespace GromaxMobileApis.Interfaces
 
         Task<dynamic> getDealerProfileDb();
         Task<bool> addDerlerSignatureDb(AddDealerSignature m);
+        Task<int> ProcessRetailReturndb(RetailReturnModel m);
+
 
 
 

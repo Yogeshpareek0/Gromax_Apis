@@ -357,7 +357,7 @@ namespace GromaxMobileApis.Models
 
         public string FinanceMasterId { get; set; }
 
-       
+
         public string remarks { get; set; } = null;
         public DateTime expectedRetailDate { get; set; }
     }
@@ -567,6 +567,18 @@ namespace GromaxMobileApis.Models
         public string DealerCategory { get; set; }
         public string location { get; set; }
         public string StateCode { get; set; }
+    }
+
+    public class RetailReturnModel
+    {
+        [Required(ErrorMessage = "Retail ID is required.")]
+        public Guid Id { get; set; }
+
+        public string ReturnBy { get; set; }
+
+        [Required(ErrorMessage = "Return Remark is required.")]
+        [StringLength(500, MinimumLength = 1, ErrorMessage = "Return Remark must be between 3 and 500 characters.")]
+        public string ReturnRemark { get; set; }
     }
 }
 
