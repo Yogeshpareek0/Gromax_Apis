@@ -3079,6 +3079,22 @@ namespace GromaxMobileApis.Controllers
             }
         }
 
+        [HttpGet]
+        [Authorize(Roles = "National Sales Head")]
+        [Route(GromaxMobileApis.Utilities.ApiRoutes.Other.ChassisTracking)]
+        public async Task<IActionResult> getChassisTracking([FromQuery] string ChassisNo)
+        {
+            try
+            {
+                var result = await _db.getChassisTrackingdb(ChassisNo);
+                return Ok(ApiResponse<IEnumerable<dynamic>>.Success(result));
+            }
+            catch (Exception Ex)
+            {
+                return Ok(ApiResponse<string>.Fail(Ex.Message));
+            }
+        }
+
 
     }
 

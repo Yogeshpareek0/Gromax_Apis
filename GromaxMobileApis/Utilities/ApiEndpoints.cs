@@ -118,6 +118,7 @@ namespace GromaxMobileApis.Utilities
             public const string imageSave = HomeBase + "imageSave";
             public const string getDealerProfile = HomeBase + "getDealerProfile";
             public const string addDealerSignature = HomeBase + "addDealerSignature";
+            public const string ChassisTracking = HomeBase + "ChassisTracking";
 
             //public const string GetStateListByLogin = HomeBase + "GetStateListByLogin";
         }

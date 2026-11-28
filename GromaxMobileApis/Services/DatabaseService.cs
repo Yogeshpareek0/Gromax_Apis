@@ -2988,5 +2988,19 @@ namespace GromaxMobileApis.Services
             }
             catch { throw; }
         }
+
+        public async Task<IEnumerable<dynamic>> getChassisTrackingdb(string ChassisNumber)
+        {
+            try
+            {
+                var param = new
+                {
+                    CHASSIS_NUMBER = ChassisNumber
+                };
+                var result = await _db.QueryAsync("usp_ChassisTracking", param: param, commandType: CommandType.StoredProcedure);
+                return result;
+            }
+            catch { throw; }
+        }
     }
 }

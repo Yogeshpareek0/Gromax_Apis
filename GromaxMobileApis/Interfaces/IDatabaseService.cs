@@ -176,6 +176,9 @@ namespace GromaxMobileApis.Interfaces
         Task<int> ProcessRetailReturndb(RetailReturnModel m);
         Task<IEnumerable<dynamic>> getRetailListForReturnUpdatedb(RetailForReturnFilterRequest m);
 
+        Task<IEnumerable<dynamic>> getChassisTrackingdb(string ChassisNumber);
+
+
 
 
 
